@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+
+    <!-- load property -->
+    <context:property-placeholder location="classpath:application.properties" />
+    <context:component-scan base-package="com.example.demo" /> 
+
+    <!-- id:object name that matches with getBean("string")  and class is fully qualified runtime object --> 
+    <!-- this is xml DI-->
+    <bean id="humanlifeobj" class="com.example.demo.Human">
+    </bean>
+    
+    <!-- constructor-arg ref matches with id of another bean-->
+    <bean id="animallife" class="com.example.demo.Animal">
+    <!-- ref:for object, value for literal-->
+    <property name="humanlife" ref="humanlifeobj"></property>
+    <property name="name" value="${name}"></property>
+    </bean>
+
+</beans>
