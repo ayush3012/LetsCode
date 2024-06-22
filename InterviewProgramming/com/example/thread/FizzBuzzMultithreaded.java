@@ -1,0 +1,93 @@
+package com.example.thread;
+
+import java.util.function.IntConsumer;
+
+class FizzBuzzz {
+    private int n;
+    private int i;
+
+    public FizzBuzzz(int n) {
+        this.n = n;
+        this.i=1;
+    }
+
+    // printFizz.run() outputs "fizz".
+    public void fizz(Runnable printFizz) throws InterruptedException {
+        synchronized(this)
+        {
+            while(i<=n)
+            {
+                if(i%3==0 && i%5!=0)
+                 {
+                   printFizz.run();
+                   i++;
+                   notifyAll();
+                 }
+                 else
+                   wait();
+            }
+        }
+    }
+
+    // printBuzz.run() outputs "buzz".
+    public void buzz(Runnable printBuzz) throws InterruptedException {
+         synchronized(this)
+        {
+            while(i<=n)
+            {
+                if(i%3!=0 && i%5==0)
+                 {
+                   printBuzz.run();
+                   i++;
+                   notifyAll();
+                 }
+                 else
+                   wait();
+            }
+        }
+    }
+
+    // printFizzBuzz.run() outputs "fizzbuzz".
+    public void fizzbuzz(Runnable printFizzBuzz) throws InterruptedException {
+         synchronized(this)
+        {
+            while(i<=n)
+            {
+                if(i%3==0 && i%5==0)
+                 {
+                   printFizzBuzz.run();
+                   i++;
+                   notifyAll();
+                 }
+                 else
+                   wait();
+            }
+        }
+    }
+
+    // printNumber.accept(x) outputs "x", where x is an integer.
+    public void number(IntConsumer printNumber) throws InterruptedException {
+         synchronized(this)
+        {
+            while(i<=n)
+            {
+                if(i%3!=0 && i%5!=0)
+                 {
+                   printNumber.accept(i);
+                   i++;
+                   notifyAll();
+                 }
+                 else
+                   wait();
+            }
+        }
+    }
+}
+public class FizzBuzzMultithreaded {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
