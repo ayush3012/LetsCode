@@ -1,7 +1,6 @@
 package com.mypack.Array;
 
-import java.util.Iterator;
-import java.util.Stack;
+import java.util.*;
 
 public class ElementGreaterThanRightSubArray {
 	
@@ -20,11 +19,34 @@ public class ElementGreaterThanRightSubArray {
 			System.out.println(it.next()+" ");
 	}
 
+	/*
+	* Below method will work efficiently.
+	* Above method can fail for different inputs like int[] arr= {10,4,1,2,5};
+	* */
+	static void GreaterThanRightSubarray(int[] arr)
+	{
+		List<Integer> al=new ArrayList<>();
+		int max=arr[arr.length-1];
+		al.add(max);
+		for(int i=arr.length-2;i>=0;i--)
+		{
+			if(arr[i]>max)
+			{
+				max=arr[i];
+				al.add(max);
+			}
+		}
+		Collections.reverse(al);
+		al.stream().forEach(i-> System.out.print(i+" "));
+	}
+
 	public static void main(String[] args) {
 		
-		int[] arr= {10,4,6,3,5};
+		int[] arr= {10,4,1,2,5};
 		
-		GreaterElement(arr);
+		//GreaterElement(arr);
+
+		GreaterThanRightSubarray(arr);
 
 	}
 
