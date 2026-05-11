@@ -25,7 +25,7 @@ final class MyImmutable //step1-make class final :: can not be make child class-
 	}
 	
 }
-public class Immutable {
+ class Immutable {
 
 	public static void main(String[] args) 
 	{

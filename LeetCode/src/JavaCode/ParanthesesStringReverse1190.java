@@ -1,4 +1,4 @@
-package JavaCode;
+package LeetCode.src.JavaCode;
 
 import java.util.*;
 /**You are given a string s that consists of lower case English letters and brackets.

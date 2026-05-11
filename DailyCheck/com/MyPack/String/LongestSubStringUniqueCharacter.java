@@ -47,14 +47,39 @@ public class LongestSubStringUniqueCharacter {
 		}
 		return len;
 	}
+
+	public static void LongestSubstringUnique_method2(String str)  // Gives String also
+	{
+		Map<Character,Integer> hm=new HashMap<>();
+		int s=0;
+		int start=0;
+		int len=0;
+		int currLen=0;
+		for(int i=0;i<str.length();i++)
+		{
+			char c=str.charAt(i);
+			if(hm.containsKey(c) && hm.get(c)>=s)
+				s=hm.get(c)+1;
+			currLen=i-s+1;
+			if(currLen>len)
+			{
+				len=currLen;
+				start=s;
+			}
+			hm.put(c,i);
+		}
+		System.out.println("Longest substring with non-repeating character "+str.substring(start,start+len));
+	}
 	public static void main(String[] args) {
 		
-		String str="geeksforgeeks";
-		//String str="dvdf";
+		//String str="geeksforgeeks";
+		String str="dvdf";
 		
 		LongestSubstring(str);
 		
 		System.out.println(LongestSubstringUnique(str));
+
+		LongestSubstringUnique_method2(str);
 	}
 
 }
