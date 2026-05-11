@@ -1,0 +1,186 @@
+Java theory:
+1. memory area, types of garbage collectors, how it works, algorithm
+2. types of memory
+3. concurrent modification exception.
+4. fail fast and fail safe
+5. working of arraylist , hashset and hashmap.
+6. can any class be key of hashmap. what will be the criteria
+7. when to use arraylist and when to use linkedlist
+8. explain public static void main(String[] args) and system.out.println
+9. what is wrapper class
+10. how to make immutable class with mutable reference, why it is required. does it violates solid principal
+11. comparable vs comparatable
+12. speed comparison of traditional vs stream vs parallel stream. why stream is slower than traditional approach.can we make it faster.
+13. forEach vs stream().forEach
+14. why we use strictFp if java is platform independent
+15. jdk vs jre vs jvm
+16. string vs stringbuffer vs stringbuilder
+17. working of concurrenthashmap
+18. 4 pillers of oops. explain with real time project example
+19. singleton class, make it thread safe, break it. prevent from breaking
+20. overloading vs overriding with code example
+21. runtime and compiletime exception
+22. rules of exception in overriding
+23. executor framework. difference between submit and execute. how it works
+24. future vs completable future
+25. == vs equals. object creation with new keyword and literal
+26. constructor in abstract class. what is the purpose
+27. difference between abstract class and interface from java 8 perspective
+28. java 8 features
+29. steps to analyze issue in production. heap dump, thread dump.
+30. hashcode and equals contract
+31. design pattern, builder, factory, abstract factory , facade, adapter. in scenario we have to check what design pattern it is.
+32. inbuilt functional interface.
+33. explain solid principal.
+34. make custom annotation
+35 java 8 date vs earlier date api.
+36. serialization code, therory , serialversionid
+37. synchronized method vs block
+38. types of lock, reentrant lock.
+39. join, wait sleep
+
+coding:
+Array----
+1.rotate array
+2.pair sum
+3.subarray with given sum
+4.subarray with max sum  --
+5.common in 3 array
+6.merge two sorted array
+7.remove duplicate
+8.k largest element
+9.add one to a number represented by array
+10.next greater number
+11.trapping rain water ---
+12.Stock Buy Sell to Maximize Profit--
+13.Minimum number of platform (minimum number of conference room required, given 2d array of start and end time)
+14.coin change (int array of denomination of unlimited coins, smallest possible combination to make target)
+15.word search in 2d matrix of character
+16. rotten orange
+17. number of island
+18. egg drop puzzle.
+19. print matrix in spiral
+
+
+LinkedList----
+1.reverse
+2.reverse every k node
+3.reverse every alternate k node
+4.find and break loop
+5.add two linked list
+
+String---
+1.reverse in place
+2.reverse every word in string array
+3.Lowest common subsequence
+4.largest prefix
+5.largest common substring
+6.longest substring without repeating character
+7.permutation of string
+8.longest palindrome
+9.longest common prefix
+10. smallest window of substring containing every char of another string
+11. decode string. str=123->abc,lc,aw...how many possible
+
+Tree---
+1.in, pre , post
+2.vertical order
+3.level oder
+4.right view
+5.mirror
+6.lca
+7.spiral traversal
+8.height
+9.diameter
+10.convert array to bst
+11.insert and delete node in BST----
+
+misc---
+1.square root
+2.balance parantheses
+3.add two binary
+4.palindrome,anagram,factorial,fibonacci
+5.LRU cache
+6.zeros in factorial
+7. print even odd using multithreading
+8. swap number without using third variable
+9. balance parantheses
+
+------------------------------------------------------------
+Stream:
+1. frequency of every char in string
+2. problem based on filter and reduce, map
+3. try to solve problems in stream.
+4. intermediate and terminal operation
+5. statistics summary api in intstream.
+6. how to debug in stream api.
+7. group anagram of string together
+
+-----------------------------------------------------------
+Spring boot:-------
+1.explain @Springbootapplication, @Controller,@component, @Restcontroller, @service, @Repository, @Configuration
+2.is @component, @Restcontroller, @service, @Repository replaceble
+3. @configuration vs @bean
+4. @qualifier , @primary
+5. @profile
+6. lifecycle of bean
+7. actuator, devtools
+8. what happens when spring boot application initializes
+9.scopes of bean . what happens internally when we change from singleton to prototype
+10.spring security working in detail
+11.applicationcontext vs beanfactory
+12.how you can configure different envs
+13. how you connect to two or more different datasource at a time
+14. how to change default server in spring boot
+15. how to customize port. server.port=0 and can we use 1 onwards
+16.ioc vs dependency injection
+17. make custom annotation
+18. exception handling in spring boot
+19. how jwt auth works
+20. static method, init method, @postConstruct, instance method. order of execution
+21. one to many mapping , explain with code
+-----------------------------------------------------------------------
+
+MS:------------
+1. disadvantage of ms
+2. how ms communicate
+3. saga design pattern
+4.basics of docker, kubernetes, gke, istio
+5. how you are handling long running transaction. compensating transaction. rollback mechanism
+6.how you are deploying ms.
+7. sidecar container, envoy proxy
+8. service discovery in project
+9. api gateway
+10. complete lifecycle of request
+11. write production ready ms for credit and debit api
+12. security in ms
+13. monolithic vs soa vs ms
+14. kafka or pub-sub working
+15. @transactional working
+16. how you are achieving data consistency in different transaction
+17. what is helm deployment
+
+-------------------------------------------------------------------------
+DB:---------
+1. how to optimize query
+2. joins
+3. nth highest salary
+4. remove duplicate
+5. stored procedures
+6. explain ACID property
+7. sharding
+8. indexing, how to create and how it works
+
+
+--------------------------------------------------------------------------
+Junit:-------
+1. @mock, @mockbean, @injectmock
+2. how to test private method and static method
+3. mock , spy, stub
+4. integration test vs junit test
+
+--------------------------------------------------------------------------
+System design:----
+1. design bookmyshow/irctc app
+2. how facebook works (high level design)
+3. tiny url
