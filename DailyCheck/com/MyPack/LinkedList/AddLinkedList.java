@@ -1,4 +1,6 @@
-package com.mypack.LinkedList;
+package DailyCheck.com.MyPack.LinkedList;
+
+import DailyCheck.com.MyPack.LinkedList.Node;
 
 import java.util.Random;
 

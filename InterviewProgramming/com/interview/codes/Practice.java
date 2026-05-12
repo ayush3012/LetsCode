@@ -1,4 +1,4 @@
-package com.interview.codes;
+package InterviewProgramming.com.interview.codes;
 
 import java.util.Iterator;
 import java.util.Stack;
