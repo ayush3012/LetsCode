@@ -1,4 +1,4 @@
-package com.mypack.LinkedList;
+package DailyCheck.com.MyPack.LinkedList;
 
 public class BasicOperation {
 	

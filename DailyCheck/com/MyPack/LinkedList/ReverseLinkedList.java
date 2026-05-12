@@ -1,4 +1,7 @@
-package com.mypack.LinkedList;
+package DailyCheck.com.MyPack.LinkedList;
+
+import DailyCheck.com.MyPack.LinkedList.BasicOperation;
+import DailyCheck.com.MyPack.LinkedList.Node;
 
 public class ReverseLinkedList extends BasicOperation {
 	

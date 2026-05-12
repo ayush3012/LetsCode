@@ -1,4 +1,4 @@
-package com.mypack.LinkedList;
+package DailyCheck.com.MyPack.LinkedList;
 
 import java.util.HashSet;
 import java.util.Set;

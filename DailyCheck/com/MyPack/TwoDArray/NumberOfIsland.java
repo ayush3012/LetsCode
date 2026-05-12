@@ -1,4 +1,4 @@
-package com.mypack.TwoDArray;
+package DailyCheck.com.MyPack.TwoDArray;
 
 public class NumberOfIsland {
 

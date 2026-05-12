@@ -1,4 +1,4 @@
-package com.mypack.TwoDArray;
+package DailyCheck.com.MyPack.TwoDArray;
 
 import java.util.Arrays;
 

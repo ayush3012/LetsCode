@@ -1,4 +1,4 @@
-package com.mypack.TwoDArray;
+package DailyCheck.com.MyPack.TwoDArray;
 
 /**
  * Here we will use DFS algorithm because at each point if we find desired character
