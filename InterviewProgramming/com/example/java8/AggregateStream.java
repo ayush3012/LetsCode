@@ -1,4 +1,6 @@
-package com.example.java8;
+package InterviewProgramming.com.example.java8;
+
+import InterviewProgramming.com.example.java8.Employee;
 
 import java.util.ArrayList;
 import java.util.List;

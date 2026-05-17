@@ -1,6 +1,6 @@
-package com.example.java8;
+package InterviewProgramming.com.example.java8;
 
- class Employee {
+ public class Employee {
 	
 	int age;
 	int salary;
