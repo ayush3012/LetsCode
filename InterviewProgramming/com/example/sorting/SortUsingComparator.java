@@ -1,4 +1,6 @@
-package com.example.sorting;
+package InterviewProgramming.com.example.sorting;
+
+import InterviewProgramming.com.example.sorting.Stu;
 
 import java.util.ArrayList;
 import java.util.Collections;
