@@ -1,4 +1,4 @@
-package com.example.thread;
+package InterviewProgramming.com.example.thread;
 
 class Evens implements Runnable{
 
