@@ -1,4 +1,4 @@
-package JavaCode;
+package LeetCode.src.JavaCode;
 
 public class ContainerWithMostWater {
 
