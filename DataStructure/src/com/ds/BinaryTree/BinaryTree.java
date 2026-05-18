@@ -1,4 +1,4 @@
-package com.ds.BinaryTree;
+package DataStructure.src.com.ds.BinaryTree;
 
 import java.util.Stack;
 
