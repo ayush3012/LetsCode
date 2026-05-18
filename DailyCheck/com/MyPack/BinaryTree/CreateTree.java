@@ -1,4 +1,4 @@
-package com.mypack.BinaryTree;
+package DailyCheck.com.MyPack.BinaryTree;
 
 class Node{
 	int data;

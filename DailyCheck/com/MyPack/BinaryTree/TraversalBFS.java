@@ -1,4 +1,4 @@
-package com.mypack.BinaryTree;
+package DailyCheck.com.MyPack.BinaryTree;
 
 import java.util.LinkedList;
 import java.util.Queue;
