@@ -1,4 +1,4 @@
-package com.mypack.Array;
+package DailyCheck.com.MyPack.Array;
 
 public class TrappingRainWater {
 	

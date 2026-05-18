@@ -1,4 +1,4 @@
-package com.mypack.Array;
+package DailyCheck.com.MyPack.Array;
 
 public class SubArrayMaxSum {
 	
@@ -21,7 +21,7 @@ public class SubArrayMaxSum {
 			if(max_so_far<0)
 			{
 				max_so_far=0;
-				s=s+1;
+				s=i+1;
 			}
 		}
 		System.out.println("subarray with maximum contigious sum "+max+" found b/w "+start+" to "+e);

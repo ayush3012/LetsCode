@@ -1,4 +1,4 @@
-package com.mypack.Array;
+package DailyCheck.com.MyPack.Array;
 
 import java.util.HashMap;
 import java.util.Map;
