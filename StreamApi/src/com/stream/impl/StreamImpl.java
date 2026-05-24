@@ -1,4 +1,4 @@
-package com.stream.impl;
+package StreamApi.src.com.stream.impl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.stream.database.Worker;
+import StreamApi.src.com.stream.database.Worker;
 
 public class StreamImpl {
 

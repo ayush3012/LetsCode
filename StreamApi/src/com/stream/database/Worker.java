@@ -1,4 +1,4 @@
-package com.stream.database;
+package StreamApi.src.com.stream.database;
 
 public class Worker {
 	
