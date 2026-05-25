@@ -23,3 +23,11 @@ public class CountDownLatchExample {
         System.out.println("All thread started.."+Thread.currentThread().getName()+" continues..");
     }
 }
+/*
+* if countdownlatch(5) and we started 3 threads only so countdown will get at 2 and never reaches 0 and
+* main thread will be blocked forever . deadlock situation
+*
+* if countdownlatch(3) and we started 5 threads -> only 3 thread will make countdown to 0 and latch.awaits
+* will be broken and all thread will run as usual and there will be no error.
+*
+* */
