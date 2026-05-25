@@ -29,3 +29,6 @@ public class CyclicBarrierExample {
         new Thread(task).start();
     }
 }
+/*
+ * same happens here also what happens in countdown latch.
+ * */
