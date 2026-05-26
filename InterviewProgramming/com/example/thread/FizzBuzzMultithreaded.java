@@ -1,7 +1,5 @@
 package InterviewProgramming.com.example.thread;
 
-import java.util.function.IntConsumer;
-
 class FizzBuzzz {
     private int n;
     private int curr;
