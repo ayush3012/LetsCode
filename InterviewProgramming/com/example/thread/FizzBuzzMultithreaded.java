@@ -4,89 +4,99 @@ import java.util.function.IntConsumer;
 
 class FizzBuzzz {
     private int n;
-    private int i;
+    private int curr;
 
     public FizzBuzzz(int n) {
         this.n = n;
-        this.i=1;
+        this.curr=1;
     }
 
     // printFizz.run() outputs "fizz".
-    public void fizz(Runnable printFizz) throws InterruptedException {
-        synchronized(this)
+    public synchronized void fizz() throws InterruptedException {
+
+        while (curr<=n)
         {
-            while(i<=n)
+            while (curr<=n && !(curr %3 ==0 && curr%5!=0))
+                wait();
+            if(curr<=n)
             {
-                if(i%3==0 && i%5!=0)
-                 {
-                   printFizz.run();
-                   i++;
-                   notifyAll();
-                 }
-                 else
-                   wait();
+                System.out.println("fizz");
+                curr++;
+                notifyAll();
             }
+
         }
+
     }
 
     // printBuzz.run() outputs "buzz".
-    public void buzz(Runnable printBuzz) throws InterruptedException {
-         synchronized(this)
+    public synchronized void buzz() throws InterruptedException {
+        while (curr<=n)
         {
-            while(i<=n)
+            while (curr<=n && !(curr%3!=0 && curr%5==0))
+                wait();
+            if(curr<=n)
             {
-                if(i%3!=0 && i%5==0)
-                 {
-                   printBuzz.run();
-                   i++;
-                   notifyAll();
-                 }
-                 else
-                   wait();
+                System.out.println("buzz");
+                curr++;
+                notifyAll();
             }
         }
     }
 
     // printFizzBuzz.run() outputs "fizzbuzz".
-    public void fizzbuzz(Runnable printFizzBuzz) throws InterruptedException {
-         synchronized(this)
-        {
-            while(i<=n)
-            {
-                if(i%3==0 && i%5==0)
-                 {
-                   printFizzBuzz.run();
-                   i++;
-                   notifyAll();
-                 }
-                 else
-                   wait();
-            }
-        }
-    }
+    public synchronized void fizzbuzz() throws InterruptedException {
 
-    // printNumber.accept(x) outputs "x", where x is an integer.
-    public void number(IntConsumer printNumber) throws InterruptedException {
-         synchronized(this)
+        while (curr<=n)
         {
-            while(i<=n)
+            while (curr<=n && !(curr%15==0))
+                wait();
+            if(curr<=n)
             {
-                if(i%3!=0 && i%5!=0)
-                 {
-                   printNumber.accept(i);
-                   i++;
-                   notifyAll();
-                 }
-                 else
-                   wait();
+                System.out.println("fizzbuzz");
+                curr++;
+                notifyAll();
             }
         }
     }
+   public synchronized void number() throws InterruptedException
+   {
+       while (curr<=n)
+       {
+           while (curr<=n && (curr%3==0 || curr%5==0))
+               wait();
+           if (curr<=n)
+           {
+               System.out.println(curr);
+               curr++;
+               notifyAll();
+           }
+       }
+   }
 }
 public class FizzBuzzMultithreaded {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+
+        FizzBuzzz fb=new FizzBuzzz(15);
+
+        new Thread(()->{
+            try {
+                fb.fizz();
+            }catch (Exception e){}
+        }).start();
+
+        new Thread(()->{
+            try {
+                fb.buzz();
+            }catch (Exception e){}
+        }).start();
+
+        new Thread(()->{
+            try {
+                fb.number();
+            }catch (Exception e){}
+        }).start();
 
 	}
 
