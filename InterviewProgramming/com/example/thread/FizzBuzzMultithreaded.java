@@ -76,7 +76,7 @@ public class FizzBuzzMultithreaded {
 
 	public static void main(String[] args) {
 
-        FizzBuzzz fb=new FizzBuzzz(15);
+        FizzBuzzz fb=new FizzBuzzz(16);
 
         new Thread(()->{
             try {
@@ -87,6 +87,12 @@ public class FizzBuzzMultithreaded {
         new Thread(()->{
             try {
                 fb.buzz();
+            }catch (Exception e){}
+        }).start();
+
+        new Thread(()->{
+            try {
+                fb.fizzbuzz();
             }catch (Exception e){}
         }).start();
 
