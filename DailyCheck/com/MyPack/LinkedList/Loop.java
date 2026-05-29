@@ -28,7 +28,24 @@ public class Loop {
 			tmp=tmp.next;
 		}
 	}
-	
+
+	static void removeLoop(Node n)
+	{
+		Node slow=n;
+		Node fast=n;
+		while (fast!=null && fast.next!=null)
+		{
+			if(slow.next==n)
+			{
+				System.out.println("loop detected");
+				slow.next=null;
+				System.out.println("loop removed");
+				break;
+			}
+			slow=slow.next;
+			fast=fast.next.next;
+		}
+	}
 	public void detectAndRemoveLoop(Node n)
 	{
 		Node tmp=n;
