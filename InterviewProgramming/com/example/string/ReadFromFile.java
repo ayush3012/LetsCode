@@ -13,13 +13,22 @@ public class ReadFromFile {
 
         Map<String,Integer> wordcount=new HashMap<>();
 
+        String regex="[^\\p{L}\\p{N}]+";
+
+        /*
+        * \p{L}= any unicode letter (english,hindi or any language)
+        * \p{N}= any unicode number
+        * [^...] = anything that is not a letter or number
+        * + = one or more separator
+        * */
+
         try(BufferedReader br= Files.newBufferedReader(Paths.get("file.txt")))
         {
             String line;
 
             while ((line=br.readLine())!=null)
             {
-                String[] words=line.toLowerCase().split("^a-zA-Z0-9+");
+                String[] words=line.toLowerCase().split(regex);
 
                 for (String word:words)
                 {
