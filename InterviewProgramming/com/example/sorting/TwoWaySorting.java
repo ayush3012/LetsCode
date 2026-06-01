@@ -46,10 +46,10 @@ public class TwoWaySorting {
                     if(arr[j]>arr[selected])
                         selected=j;
                 }
-                int temp=arr[i];
-                arr[i]=arr[selected];
-                arr[selected]=temp;
             }
+            int temp=arr[i];
+            arr[i]=arr[selected];
+            arr[selected]=temp;
         }
         for(int a:arr)
             System.out.print(a+" ");
