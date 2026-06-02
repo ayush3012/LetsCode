@@ -1,8 +1,6 @@
 package com.mypack.Array;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class PairSum {
 	
@@ -48,12 +46,31 @@ public class PairSum {
 		}
 		System.out.println("total pairs: "+count);
 	}
+
+	static int[] twoSum_linearTime(int[] arr,int target)
+	{
+		Map<Integer,Integer> hm=new HashMap<>();
+		for(int i=0;i<arr.length;i++)
+		{
+			int complement=target-arr[i];
+			if(hm.containsKey(complement))
+				return new int[]{hm.get(complement),i};
+			hm.put(arr[i],i);
+		}
+		return new int[]{-1,-1};
+	}
 	public static void main(String[] args) {
 		
 		int[] arr = { 1, 5, 7, -1, 5 };
         int sum = 6;
         method1(arr,sum);System.out.println();
         method2(arr, sum);
+		System.out.println();
+
+		int[] arr2 = { 1, 5, 7, -1, 5 };
+		System.out.println("Index of pair whose sum is: "+sum);
+		for (int a:twoSum_linearTime(arr2,sum))
+			System.out.print(a+" ");
 
 	}
 
