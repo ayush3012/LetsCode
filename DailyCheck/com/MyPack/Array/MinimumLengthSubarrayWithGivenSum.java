@@ -24,6 +24,7 @@ public class MinimumLengthSubarrayWithGivenSum {
 	static void subArrayWithGivenSumMinLen(int[] arr,int k)
 	{
 		Map<Integer,Integer> hm=new HashMap<>();
+		hm.put(0,-1);
 		int s=0;
 		int e=0;
 		int window=0;
