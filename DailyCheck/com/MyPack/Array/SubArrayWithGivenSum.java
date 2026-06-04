@@ -1,7 +1,6 @@
 package DailyCheck.com.MyPack.Array;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SubArrayWithGivenSum {
 	
@@ -34,11 +33,33 @@ public class SubArrayWithGivenSum {
 		System.out.println("total subarray: "+count);
 	}
 
+	static void StoreAllSubarray(int[] arr,int sum)
+	{
+		Map<Integer,Integer> hm=new HashMap<>();
+		hm.put(0,-1);
+		List<int[]> al=new ArrayList<>();
+		int window=0;
+		for(int i=0;i<arr.length;i++)
+		{
+			window+=arr[i];
+			if(hm.containsKey(window-sum))
+			{
+				int j=hm.get(window-sum)+1;
+				al.add(Arrays.copyOfRange(arr,j,i+1));
+			}
+			hm.put(window,i);
+		}
+		for(int[] res:al)
+			System.out.println(Arrays.toString(res));
+	}
 	public static void main(String[] args) {
 		int[] arr = { 10, 2, -2, -20, 10 };
         int sum = -10;
         
         SubArraySum(arr, sum);
+		System.out.println();
+
+		StoreAllSubarray(arr,sum);
 	}
 
 }
