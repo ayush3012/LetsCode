@@ -1,9 +1,9 @@
-package com.example.designpattern;
+package InterviewProgramming.com.example.designpattern;
 
 import java.util.ArrayList;
 import java.util.List;
 //It is creational design pattern
-//In clone->it gives shallow copy of object i.e both reference will point to different object. If we change one
+//In clone->it gives shallow copy of object i.e both reference will point to same object. If we change one
 //one object other will also gets changed
 //prototype is resolving that only= in this design pattern we override clone method to get a seprate object
 //copy.if i perform operation will does not affect other.
