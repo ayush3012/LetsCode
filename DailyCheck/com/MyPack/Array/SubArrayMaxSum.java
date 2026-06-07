@@ -1,5 +1,7 @@
 package DailyCheck.com.MyPack.Array;
 
+import java.util.Arrays;
+
 public class SubArrayMaxSum {
 	
 	public static void SubArrayMaxSum(int[] arr)
@@ -27,6 +29,32 @@ public class SubArrayMaxSum {
 		System.out.println("subarray with maximum contigious sum "+max+" found b/w "+start+" to "+e);
 	}
 
+ // More efficient Kadane's Algo which handle all negative numbers
+	static void KadaneAlgo(int[] arr)
+	{
+		int maxSum=arr[0];
+		int currSum=arr[0];
+		int st=0,start=0,end=0;
+
+		for(int i=1;i<arr.length;i++)
+		{
+			if(arr[i]>currSum+arr[i])
+			{
+				currSum=arr[i];
+				st=i;
+			}else {
+				currSum+=arr[i];
+			}
+
+			if(currSum>maxSum)
+			{
+				maxSum=currSum;
+				start=st;
+				end=i;
+			}
+		}
+		System.out.println("Subarray with max sum is: "+maxSum+" from :"+start+" to "+end);
+	}
 	public static void main(String[] args) {
 		
 		int[] arr = { -2, -3, 4, -1, -2, 1, 5, -3 };
@@ -34,6 +62,12 @@ public class SubArrayMaxSum {
 		//int[] arr = { 1,2,3,-4,-5,6,7 };
 		
 		SubArrayMaxSum(arr);
+
+		int[] arr2 = { -2, -3, -4, -1, -2, -1, -5, -3 };
+
+		KadaneAlgo(arr2);
+
+		KadaneAlgo(arr);
 	}
 
 }
