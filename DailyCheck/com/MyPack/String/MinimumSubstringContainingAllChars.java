@@ -39,11 +39,43 @@ public class MinimumSubstringContainingAllChars {
         System.out.println(s.substring(start,start+min));
 
     }
+
+    static String minWindow_method2(String s,String t)
+    {
+        if(s.length()<t.length()) return "";
+
+        int[] freq=new int[128];
+
+        for(char c:t.toCharArray()) freq[c]++;
+
+        int left=0,start=0,minLen=Integer.MAX_VALUE;
+        int required=t.length();
+
+        for(int right=0;right<s.length();right++)
+        {
+            if(freq[s.charAt(right)]-- >0)
+                required--;
+            while (required==0)
+            {
+                if(right-left+1<minLen)
+                {
+                    minLen=right-left+1;
+                    start=left;
+                }
+                if(++freq[s.charAt(left++)]>0)
+                    required++;
+            }
+        }
+        return minLen==Integer.MAX_VALUE?"":s.substring(start,start+minLen);
+    }
     public static void main(String[] args)
     {
         String s="adobecodebanc";
         String x="abc";
 
         minWindow(s,x);
+        System.out.println();
+
+        System.out.println(minWindow_method2(s,x));
     }
 }
