@@ -15,7 +15,7 @@ public class ProductOfArrayExceptItself {
         for(int i=n-1;i>=0;i--)
         {
             result[i]=result[i]*suffix;
-            suffix=suffix*arr[i] ;
+            suffix=suffix*arr[i];
         }
         System.out.println(Arrays.toString(result));
     }
