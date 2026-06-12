@@ -23,13 +23,38 @@ public class TrappingRainWater {
 		System.out.println("stored water "+water);
 	}
 
+	static void trap(int[] arr)
+	{
+		int left=0,right=arr.length-1;
+		int leftMax=0,rightMax=0,water=0;
+		while(left<right)
+		{
+			if(arr[left]<arr[right])
+			{
+				if(leftMax<=arr[left])
+					leftMax=arr[left];
+				else water+=leftMax-arr[left];
+				left++;
+			}else {
+				if(rightMax<=arr[right])
+					rightMax=arr[right];
+				else water+=rightMax-arr[right];
+				right--;
+			}
+		}
+		System.out.println("total water contained is: "+water);
+	}
 	public static void main(String[] args) {
 		
 
-		//int[] arr = { 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1 };
-		int[] arr = { 1, 1 };
+		int[] arr = { 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1 };
+		//int[] arr = { 1, 1 };
 		
 		TrapWater(arr);
+
+		System.out.println();
+
+		trap(arr);
 	}
 
 }
