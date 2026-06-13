@@ -31,15 +31,11 @@ public class TrappingRainWater {
 		{
 			if(arr[left]<arr[right])
 			{
-				if(leftMax<=arr[left])
-					leftMax=arr[left];
-				else water+=leftMax-arr[left];
-				left++;
+				leftMax=Math.max(leftMax,arr[left]);
+				water+=leftMax-arr[left++];
 			}else {
-				if(rightMax<=arr[right])
-					rightMax=arr[right];
-				else water+=rightMax-arr[right];
-				right--;
+				rightMax=Math.max(rightMax,arr[right]);
+				water+=rightMax-arr[right--];
 			}
 		}
 		System.out.println("total water contained is: "+water);
