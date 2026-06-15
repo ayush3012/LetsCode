@@ -40,3 +40,31 @@ public class ProducerConsumerBlockingQueue {
         new Thread(consumer).start();
     }
 }
+/*
+*  static void ProducerConsumerUsingExecutor() {
+
+        BlockingQueue<Integer> bq = new ArrayBlockingQueue<>(5);
+        ExecutorService service = Executors.newFixedThreadPool(2);
+
+        service.submit(() -> {
+            for (int i = 0; i < 10; i++) {
+                System.out.println("produced:" + i);
+                try {
+                    bq.put(i);
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                }
+            }
+        });
+
+        service.submit(() -> {
+            while (true) {
+                int a = bq.take();
+                System.out.println("consumed: " + a);
+            }
+        });
+
+        service.shutdown();
+
+    }
+* */
