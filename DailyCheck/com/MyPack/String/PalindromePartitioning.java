@@ -12,12 +12,12 @@ public class PalindromePartitioning {
             res.add(new ArrayList<>(comb));
             return;
         }
-        for(int e=0;e<str.length();e++)
+        for(int e=start;e<str.length();e++)
         {
             if(dp[start][e])
             {
                 comb.add(str.substring(start,e+1));
-                backtrack(str,start+1,dp,comb,res);
+                backtrack(str,e+1,dp,comb,res);
                 comb.remove(comb.size()-1);
             }
         }
