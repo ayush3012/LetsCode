@@ -34,11 +34,40 @@ public class PalindromePartitioning {
         backtrack(str,0,dp,new ArrayList<>(),res);
         for(List<String> al:res)
             System.out.println(al);
+
+        /*
+        * if we want all in one single set with no duplicate
+        *  Set<String> set=new HashSet();
+        * for(List<String> a:res)
+        *   set.addAll(a);
+        * System.ou.println(set);
+        * */
+    }
+
+    static void countOnlyPartition(String s)
+    {
+        boolean[][] pal=new boolean[s.length()][s.length()];
+        for(int i=s.length()-1;i>=0;i--)
+            for(int j=i;j<s.length();j++)
+                pal[i][j]=s.charAt(i)==s.charAt(j) && (j-i<2 || pal[i+1][j-1]);
+
+        long[] dp=new long[s.length()+1];
+        dp[s.length()]=1;
+        for(int i=s.length()-1;i>=0;i--)
+            for(int j=i;j<s.length();j++)
+                if(pal[i][j])
+                    dp[i]+=dp[j+1];
+
+        System.out.println(dp[0]);
     }
     public static void main(String[] args) {
         String str="ababa";
 
         generatePalindrome(str);
+
+        System.out.println();
+
+        countOnlyPartition(str);
 
     }
 }
