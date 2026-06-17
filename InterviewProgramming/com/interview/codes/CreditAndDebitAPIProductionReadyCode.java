@@ -50,6 +50,23 @@ class Transaction{
         this.timestamp = timestamp;
     }
 
+    public int getAccountId()
+    {
+        return this.accountId;
+    }
+    public String getTxnId()
+    {
+        return this.txnId;
+    }
+
+    public int getAmount()
+    {
+        return this.amount;
+    }
+    public String getType()
+    {
+        return this.type;
+    }
     @Override
     public String toString() {
         return "Transaction{" +
@@ -107,7 +124,7 @@ class Services{
 
         try {
             account.setBalance(account.getBalance()-amount);
-            auditLog.add(new Transaction(txnId,accountId,amount,"DEBIT",LocalDateTime.now()));
+            auditLog.add(new Transaction(txnId,accountId,amount,"DEBIT ",LocalDateTime.now()));
         }finally {
             account.getLock().unlock();
         }
@@ -116,6 +133,35 @@ class Services{
     public int getBalance(int accountId)
     {
         return accounts.get(accountId).getBalance();
+    }
+
+    public void printStatement(int accountId) {
+
+        Account account = accounts.get(accountId);
+
+        System.out.println("\n===== ACCOUNT STATEMENT =====");
+
+        synchronized (auditLog) {
+
+            for (Transaction tx : auditLog) {
+
+                if (tx.getAccountId() == accountId) {
+
+                    System.out.println(
+                            tx.getType()
+                                    + " | "
+                                    + tx.getAmount()
+                                    + " | "
+                                    + tx.getTxnId());
+                }
+            }
+        }
+
+        System.out.println(
+                "Current Balance : "
+                        + account.getBalance());
+
+        System.out.println("=============================");
     }
 }
 
@@ -129,12 +175,22 @@ public class CreditAndDebitAPIProductionReadyCode {
 
         ExecutorService executor= Executors.newFixedThreadPool(2);
 
-        for(int i=1;i<10;i++)
+        for(int i=1;i<5;i++) {
+            int txnId = i;
+            executor.submit(() -> {
+                try {
+                    service.debit(101, 10, "TXN-" + txnId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        for(int i=5;i<10;i++)
         {
-            int txnId=i;
+            int txnId = i;
             executor.submit(()->{
                 try {
-                    service.debit(101,10,"TXN-"+txnId);
+                    service.credit(101,11,"TXN-"+txnId);
                 }catch (Exception e)
                 {
                     e.printStackTrace();
@@ -146,6 +202,8 @@ public class CreditAndDebitAPIProductionReadyCode {
 
         while (!executor.isTerminated()){}
 
-        System.out.println(service.getBalance(101));
+        System.out.println("Final balance : "+service.getBalance(101));
+
+        service.printStatement(101);
     }
 }
