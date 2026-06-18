@@ -35,5 +35,7 @@ public class Oneto100Using3Thread {
                 } catch (Exception e) {}
             });
         }
+
+        es.shutdown();
     }
 }
