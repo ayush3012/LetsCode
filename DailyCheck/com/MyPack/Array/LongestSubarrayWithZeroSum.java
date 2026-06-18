@@ -21,7 +21,8 @@ public class LongestSubarrayWithZeroSum {
         System.out.println("Max Length:"+max);
     }
     public static void main(String[] args) {
-        int[] arr={1,0,2,-1,-1,-1,0,1,-1};
+        int[] arr={1,0,2,-1,-1,-1,0,1,-1}; //if you have given an array of 0,1 and asked to find longest subarray
+                                           // with equal 0 and 1 then convert 0 to -1 and apply this approach.
 
         zeroSum(arr);
     }
