@@ -12,9 +12,16 @@ public class Operations {
     // get list of 2 employee from each department whose salary is highest
     // and if salary is same then compare by name
     /*
-      SQL query for employee with highest salary in each department
-      select * from ( select e.*, dense_rank() over (partition by department order by salaey desc)r
+      SQL query for employee with highest salary in each department::
+      select * from ( select e.*, dense_rank() over (partition by department order by salary desc)r
       from employee e) where e.r=1;
+
+      SQL query for second highest salary::
+      select * from (select *, dense_rank() over (order by salary desc)r from employee) where r=2;
+
+      SQL query to delete duplicate record::
+      delete from employee where id IN (select id from (select id,ROW_NUMBER() over (partition by email order
+      by order_id)r from employee) where r>1);
     * */
     static void DepartmentWithHighestSalary(List<Employee> employeeList)
     {
