@@ -128,6 +128,19 @@ public class Operations {
 
         al.stream().collect(Collectors.toMap(Function.identity(),String::length))
                 .forEach((k,v)-> System.out.println(k+" with length "+v));
+
+        System.out.println("\n======first unique element==========");
+        s.chars().mapToObj(i->Character.valueOf((char)i))
+                .filter(i->s.indexOf(i)==s.lastIndexOf(i))
+                .limit(1)
+                .forEach(i-> System.out.println("first unique char in "+s+" is: "+i));
+
+        System.out.println("\n======Sum of element of array==========");
+        int[] arr={1,2,3,4,5,6,7,8,9};
+
+        int sum=Arrays.stream(arr).reduce(0,(a,b)->a+b);
+
+        System.out.println("sum of all element of array: "+Arrays.toString(arr)+" = "+sum);
     }
     public static void main(String[] args) {
 
