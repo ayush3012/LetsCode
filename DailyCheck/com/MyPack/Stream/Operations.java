@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Operations {
 
@@ -95,6 +97,35 @@ public class Operations {
 
         System.out.println(e);
     }
+
+    static void basicOperation()
+    {
+        String s="geeksforgeeks";
+
+        //count frequency
+        System.out.println("=====count frequency=====");
+        s.chars().mapToObj(i->Character.valueOf((char)i))
+                .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+                .forEach((k,v)-> System.out.println(k+" = "+v));
+
+        System.out.println("========================");
+
+        s.chars().mapToObj(i->Character.valueOf((char)i))
+                .collect(Collectors.toMap(Function.identity(),i->1,Integer::sum))
+                .forEach((k,v)-> System.out.println(k+"->"+v));
+
+        System.out.println("======Reverse string==========");
+        //reverse string
+        String rev=IntStream.range(0,s.length()).map(i->s.length()-i-1)
+                .mapToObj(i->""+s.charAt(i)).collect(Collectors.joining(""));
+
+        System.out.println("reverse of "+s+" is: "+rev);
+
+        System.out.println("======Fibonacci series==========");
+        Stream.iterate(new int[]{0,1},f->new int[]{f[1],f[0]+f[1]})
+                .map(i->i[0])
+                .limit(10).forEach(i-> System.out.print(i+" "));
+    }
     public static void main(String[] args) {
 
         List<Employee> employeeList= DatabaseOfEmployee.getEmployees();
@@ -130,5 +161,8 @@ public class Operations {
 
         //longest named employee
         //longestNamedEmployee(employeeList);
+
+        //basic operations
+        basicOperation();
     }
 }
