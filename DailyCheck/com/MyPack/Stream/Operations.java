@@ -1,9 +1,6 @@
 package DailyCheck.com.MyPack.Stream;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -125,6 +122,12 @@ public class Operations {
         Stream.iterate(new int[]{0,1},f->new int[]{f[1],f[0]+f[1]})
                 .map(i->i[0])
                 .limit(10).forEach(i-> System.out.print(i+" "));
+
+        System.out.println("\n======String length==========");
+        List<String> al= List.of("ayush","karna","rahul","om","jagadish");
+
+        al.stream().collect(Collectors.toMap(Function.identity(),String::length))
+                .forEach((k,v)-> System.out.println(k+" with length "+v));
     }
     public static void main(String[] args) {
 
