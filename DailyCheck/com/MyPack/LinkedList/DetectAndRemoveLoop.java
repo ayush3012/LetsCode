@@ -66,12 +66,42 @@ public class DetectAndRemoveLoop {
         System.out.println("end : "+end.data);
 
     }
+    static void loop2(Node n)
+    {
+        Node slow=n;
+        Node fast=n;
+        while(fast!=null && fast.next!=null)
+        {
+            slow=slow.next;
+            fast=fast.next.next;
+            if(slow==fast)
+            {
+                System.out.println("loop exists");
+                slow=n;
+                if(slow==fast)
+                    while (fast.next!=slow)
+                        fast=fast.next;
+                else {
+                    while (slow.next!=fast.next)
+                    {
+                        slow=slow.next;
+                        fast=fast.next;
+                    }
+                }
+                System.out.println("starts: "+fast.next.data+" end: "+fast.data);
+                fast.next=null;
+                System.out.println("loop removed");
+            }
+        }
+    }
     public static void main(String[] args) {
         int[] arr={0,1,2,3,4,5,6,7,8,9};
 
         Node n=create(arr);
 
-        loop(n);
+        //loop(n);
+
+        loop2(n);
 
         display(n);
     }
