@@ -55,6 +55,18 @@ public class SubArrayMaxSum {
 		}
 		System.out.println("Subarray with max sum is: "+maxSum+" from :"+start+" to "+end);
 	}
+
+	static void max_sum_Kadane(int[] arr)
+	{
+		int curr=arr[0];
+		int max=arr[0];
+		for(int i=1;i<arr.length;i++)
+		{
+			curr=Math.max(arr[i],curr+arr[i]);
+			max=Math.max(max,curr);
+		}
+		System.out.println("max sum:"+max);
+	}
 	public static void main(String[] args) {
 		
 		int[] arr = { -2, -3, 4, -1, -2, 1, 5, -3 };
@@ -68,6 +80,10 @@ public class SubArrayMaxSum {
 		KadaneAlgo(arr2);
 
 		KadaneAlgo(arr);
+
+		max_sum_Kadane(arr);
+
+		max_sum_Kadane(arr2);
 	}
 
 }
