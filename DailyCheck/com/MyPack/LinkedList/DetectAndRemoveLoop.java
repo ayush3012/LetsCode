@@ -31,40 +31,36 @@ public class DetectAndRemoveLoop {
     static void loop(Node n)
     {
         Node slow=n,fast=n;
+        boolean isCycle=false;
         while(fast!=null && fast.next!=null)  // detect cycle
         {
             slow=slow.next;
             fast=fast.next.next;
             if(slow==fast)
+            {
+                isCycle=true;
                 break;
+            }
         }
 
-        if(fast==null || fast.next==null)    // no cycle
+        if(!isCycle)
         {
-            System.out.println("\nNo cycle");
+            System.out.println("no cycle");
             return;
         }
-
         slow=n;
-        while (slow!=fast)     //start of the cycle
+        while (fast!=slow)
         {
             slow=slow.next;
             fast=fast.next;
         }
-
         Node start=slow;
         Node end=start;
         while (end.next!=start)
             end=end.next;
-
-        while(fast.next!=slow)    //last of the node
-            fast=fast.next;
-
-        fast.next=null;     // removed loop
-
-        System.out.println("start :"+start.data);
-        System.out.println("end : "+end.data);
-
+        //end.next=null //remove loop
+        System.out.println("starting is: "+start.data);
+        System.out.println("ending is: "+end.next);
     }
     static void loop2(Node n)
     {
