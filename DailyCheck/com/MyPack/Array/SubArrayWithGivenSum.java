@@ -52,6 +52,19 @@ public class SubArrayWithGivenSum {
 		for(int[] res:al)
 			System.out.println(Arrays.toString(res));
 	}
+
+	static void leetcode_560(int[] nums,int k)
+	{
+		Map<Integer,Integer> hm=new HashMap();
+		int sum=0,count=0;
+		for(int a:nums)
+		{
+			sum+=a;
+			count+=hm.getOrDefault(sum-k,0);
+			hm.put(sum,hm.getOrDefault(sum,0)+1);
+		}
+		System.out.println("total subarray with sum "+k+" is: "+count);
+	}
 	public static void main(String[] args) {
 		int[] arr = { 10, 2, -2, -20, 10 };
         int sum = -10;
@@ -60,6 +73,8 @@ public class SubArrayWithGivenSum {
 		System.out.println();
 
 		StoreAllSubarray(arr,sum);
+
+		leetcode_560(arr,sum);
 	}
 
 }
