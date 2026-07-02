@@ -8,13 +8,13 @@ public class SlidingWindowMax239 {
 
     static void code(int[] nums,int k)
     {
-        Deque<Integer> dq=new ArrayDeque<>();
+        Deque<Integer> dq=new ArrayDeque<>();           // deque stores index
         int[] res=new int[nums.length-k+1];
         int r=0;
         for(int i=0;i<nums.length;i++)
         {
-            while (!dq.isEmpty() && dq.peekFirst()<=i-k)
-                dq.removeFirst();
+            while (!dq.isEmpty() && dq.peekFirst()<=i-k)     // peekFirst:index of head
+                dq.removeFirst();                            // remove first index
             while (!dq.isEmpty() && nums[dq.peekLast()]<=nums[i])
                 dq.removeLast();
             dq.addLast(i);
