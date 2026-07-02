@@ -16,37 +16,36 @@ public class DeadLock {
     public static void main(String[] args)
     {
         Thread t1=new Thread(()->{
-                synchronized (lock1)
-                {
+                synchronized (lock1) {
                     System.out.println("thread1 acquired lock1");
                     try {
                         Thread.sleep(100);
-                    }catch (InterruptedException e){}
-                }
+                    } catch (InterruptedException e) {
+                    }
 
-            System.out.println("thread1 waiting for lock2");
+                    System.out.println("thread1 waiting for lock2");
 
-                synchronized (lock2)
-                {
-                    System.out.println("thread1 acquired lock2");
-                }
+                    synchronized (lock2) {
+                        System.out.println("thread1 acquired lock2");
+                    }
+                } //synchronized1 should end here
 
         });
 
         Thread t2=new Thread(()->{
-            synchronized (lock2)
-            {
+            synchronized (lock2) {
                 System.out.println("thread2 acquired lock2");
                 try {
                     Thread.sleep(100);
-                }catch (InterruptedException e){}
-            }
+                } catch (InterruptedException e) {
+                }
 
-            System.out.println("thread2 waiting for lock1");
+                System.out.println("thread2 waiting for lock1");
 
-            synchronized (lock1)
-            {
-                System.out.println("thread2 acquired lock1");
+                synchronized (lock1) {
+                    System.out.println("thread2 acquired lock1");
+                }
+
             }
 
         });
