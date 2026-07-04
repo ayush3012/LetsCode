@@ -5,8 +5,7 @@ public class PaymentService {
 
         sleep(3000);
 
-        System.out.println(Thread.currentThread().getName()
-                + " -> Payment Service");
+        System.out.println(Thread.currentThread().getName() + " -> Payment Service");
 
         return new Payment(id, 5000);
     }

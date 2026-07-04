@@ -5,8 +5,7 @@ public class UserService {
 
         sleep(3000);
 
-        System.out.println(Thread.currentThread().getName()
-                + " -> User Service");
+        System.out.println(Thread.currentThread().getName() + " -> User Service");
 
         return new User(id, "Ayush");
     }

@@ -5,8 +5,7 @@ public class RewardService {
 
         sleep(3000);
 
-        System.out.println(Thread.currentThread().getName()
-                + " -> Reward Service");
+        System.out.println(Thread.currentThread().getName() + " -> Reward Service");
 
         return new Reward(250);
     }

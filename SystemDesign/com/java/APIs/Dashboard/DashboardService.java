@@ -9,38 +9,19 @@ public class DashboardService {
     private final PaymentService paymentService = new PaymentService();
     private final RewardService rewardService = new RewardService();
 
-    private final ExecutorService executor =
-            Executors.newFixedThreadPool(3);
+    private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     public DashboardResponse getDashboard(Long id) {
 
-        CompletableFuture<User> userFuture =
-                CompletableFuture.supplyAsync(
-                        () -> userService.getUser(id),
-                        executor);
+        CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> userService.getUser(id), executor);
 
-        CompletableFuture<Payment> paymentFuture =
-                CompletableFuture.supplyAsync(
-                        () -> paymentService.getPayment(id),
-                        executor);
+        CompletableFuture<Payment> paymentFuture = CompletableFuture.supplyAsync(() -> paymentService.getPayment(id), executor);
 
-        CompletableFuture<Reward> rewardFuture =
-                CompletableFuture.supplyAsync(
-                        () -> rewardService.getReward(id),
-                        executor);
+        CompletableFuture<Reward> rewardFuture = CompletableFuture.supplyAsync(() -> rewardService.getReward(id), executor);
 
-        CompletableFuture<Void> all =
-                CompletableFuture.allOf(
-                        userFuture,
-                        paymentFuture,
-                        rewardFuture);
+        CompletableFuture<Void> all = CompletableFuture.allOf(userFuture, paymentFuture, rewardFuture);
 
-        return all.thenApply(v ->
-                        new DashboardResponse(
-                                userFuture.join(),
-                                paymentFuture.join(),
-                                rewardFuture.join()))
-                .join();
+        return all.thenApply(v -> new DashboardResponse(userFuture.join(), paymentFuture.join(), rewardFuture.join())).join();
     }
 
     public void shutdown() {
