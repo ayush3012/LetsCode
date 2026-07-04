@@ -47,3 +47,34 @@ public class DashboardService {
         executor.shutdown();
     }
 }
+/*
+for mandatory service we should not throw exception with exceptionally and it will get fail in future.get
+but for optional we should handle it with exceptionally and return default response
+* // Optional Future
+        CompletableFuture<Payment> paymentFuture =
+                CompletableFuture
+                        .supplyAsync(
+                                paymentService::getPayment,
+                                executor)
+                        .exceptionally(ex -> {
+
+                            System.out.println(
+                                    "Payment Failed. Returning Default Payment");
+
+                            return new Payment(0);
+                        });
+
+        // Optional Future
+        CompletableFuture<Reward> rewardFuture =
+                CompletableFuture
+                        .supplyAsync(
+                                rewardService::getReward,
+                                executor)
+                        .exceptionally(ex -> {
+
+                            System.out.println(
+                                    "Reward Failed. Returning Default Reward");
+
+                            return new Reward(0);
+                        });
+ */
