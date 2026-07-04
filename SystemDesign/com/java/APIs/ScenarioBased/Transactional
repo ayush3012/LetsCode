@@ -1,0 +1,1035 @@
+1. What is Transaction?
+
+A transaction is a group of operations that execute as a single unit of work.
+
+Example
+
+Transfer ₹100
+
+Step 1:
+Debit Account A
+
+Step 2:
+Credit Account B
+
+Possible situations
+
+Debit Success
+Credit Success
+
+Everything is good.
+
+But
+
+Debit Success
+Credit Failed
+
+Money disappears.
+
+Transaction guarantees
+
+Either
+
+Debit + Credit
+
+OR
+
+Nothing.
+2. ACID Properties
+
+Interviewers love this.
+
+A — Atomicity
+
+Everything happens or nothing happens.
+
+Example
+
+Debit 100
+
+Credit 100
+
+If credit fails
+
+Rollback debit.
+C — Consistency
+
+Database always remains valid.
+
+Example
+
+Before
+
+A = 1000
+B = 500
+
+Transfer
+
+100
+
+After
+
+A = 900
+B = 600
+
+Total money remains
+
+1500
+I — Isolation
+
+Multiple transactions should not interfere.
+
+We'll discuss later.
+
+D — Durability
+
+Once committed
+
+Data survives crash.
+
+Stored on disk.
+
+3. What does @Transactional actually do?
+
+Many people answer
+
+"It starts transaction."
+
+Incomplete answer.
+
+Actual sequence
+
+Client
+
+↓
+
+Spring Proxy
+
+↓
+
+Transaction Manager
+
+↓
+
+Open Connection
+
+↓
+
+Disable Auto Commit
+
+↓
+
+Business Logic
+
+↓
+
+Commit/Rollback
+
+↓
+
+Close Connection
+
+Internally
+
+Connection.setAutoCommit(false)
+
+execute SQL
+
+Connection.commit()
+
+or
+
+Connection.rollback()
+4. Who handles @Transactional?
+
+Spring itself doesn't.
+
+AOP handles it.
+
+Proxy
+
+↓
+
+TransactionInterceptor
+
+↓
+
+PlatformTransactionManager
+
+Important interview answer
+
+@Transactional works using Spring AOP Proxy.
+5. Internal Flow
+
+Suppose
+
+@Transactional
+public void placeOrder() {
+
+    saveOrder();
+
+    savePayment();
+
+}
+
+Flow
+
+Client
+
+↓
+
+Proxy intercepts
+
+↓
+
+Begin transaction
+
+↓
+
+placeOrder()
+
+↓
+
+saveOrder()
+
+↓
+
+savePayment()
+
+↓
+
+commit
+
+↓
+
+return
+
+If exception
+
+rollback
+6. Which Transaction Manager?
+
+Spring chooses based on project.
+
+For JDBC
+
+DataSourceTransactionManager
+
+For JPA
+
+JpaTransactionManager
+
+For JTA
+
+JtaTransactionManager
+
+Most Spring Boot projects
+
+JpaTransactionManager
+7. What happens in database?
+
+Normally
+
+INSERT
+
+commit immediately
+
+Inside transaction
+
+BEGIN
+
+INSERT
+
+UPDATE
+
+DELETE
+
+COMMIT
+
+or
+
+ROLLBACK
+8. Default Rollback Rules
+
+Very famous interview question.
+
+Will rollback?
+
+throw new RuntimeException();
+
+YES
+
+Will rollback?
+
+throw new NullPointerException();
+
+YES
+
+Will rollback?
+
+throw new IOException();
+
+NO
+
+Checked exception.
+
+Why?
+
+Spring default
+
+Rollback
+
+↓
+
+RuntimeException
+
+↓
+
+Error
+
+Not
+
+Checked Exception
+
+To rollback checked exception
+
+@Transactional(rollbackFor = Exception.class)
+
+or
+
+@Transactional(
+rollbackFor = IOException.class)
+9. Why checked exception doesn't rollback?
+
+Historical Java design.
+
+Checked exceptions are considered recoverable.
+
+Spring assumes
+
+IOException
+
+↓
+
+Application can recover.
+
+So no rollback.
+
+10. rollbackFor
+@Transactional(
+rollbackFor = Exception.class)
+
+Now
+
+IOException
+
+SQLException
+
+Exception
+
+
+All rollback.
+
+11. noRollbackFor
+@Transactional(
+noRollbackFor = BusinessException.class)
+
+Now
+
+BusinessException
+
+↓
+
+commit
+
+even though exception occurred.
+
+12. Propagation
+
+One of the biggest interview topics.
+
+Imagine
+
+A()
+
+calls
+
+B()
+
+Both transactional.
+
+Question
+
+Should B create new transaction?
+
+Should B join?
+
+That's propagation.
+
+There are seven propagation types.
+
+Most important
+
+REQUIRED
+
+REQUIRES_NEW
+
+SUPPORTS
+
+NOT_SUPPORTED
+
+MANDATORY
+
+NEVER
+
+NESTED
+REQUIRED (Default)
+If transaction exists
+
+↓
+
+Join it
+
+Else
+
+↓
+
+Create new
+
+Example
+
+OrderService
+
+↓
+
+PaymentService
+
+Both
+
+@Transactional
+
+Only one transaction.
+
+Flow
+
+Begin
+
+↓
+
+Order
+
+↓
+
+Payment
+
+↓
+
+Commit
+REQUIRES_NEW
+
+Always
+
+Suspend current
+
+↓
+
+Create new transaction
+
+Example
+
+Order
+
+↓
+
+Audit Log
+
+Even if
+
+Order fails
+
+Audit still committed.
+
+Flow
+
+Tx1
+
+↓
+
+Suspend
+
+↓
+
+Tx2
+
+↓
+
+Commit Tx2
+
+↓
+
+Resume Tx1
+SUPPORTS
+
+If transaction exists
+
+Join
+
+Else
+
+Run without transaction.
+
+Useful for read methods.
+
+NOT_SUPPORTED
+
+Suspend transaction.
+
+Execute without transaction.
+
+MANDATORY
+
+Existing transaction required.
+
+Else
+
+IllegalTransactionStateException
+NEVER
+
+Should NOT have transaction.
+
+If transaction exists
+
+Exception.
+
+NESTED
+
+Creates savepoint.
+
+Rollback only nested portion.
+
+Requires JDBC support.
+
+Rare.
+
+Isolation Levels
+
+Prevents concurrency problems.
+
+Imagine
+
+User A
+
+reads salary
+
+User B
+
+updates salary
+
+What should User A see?
+
+Isolation decides.
+
+Problems
+
+Dirty Read
+
+Non-repeatable Read
+
+Phantom Read
+
+Dirty Read
+
+Tx1
+
+Update Salary = 100
+
+Not committed
+
+Tx2
+
+Reads
+
+100
+
+Then
+
+Tx1
+
+Rollback.
+
+Tx2 read invalid data.
+
+Non-repeatable Read
+
+Read salary =100
+
+Another transaction
+
+updates=200
+
+Read again
+
+200
+
+Same query
+
+Different result.
+
+Phantom Read
+
+SELECT employees
+
+10 rows
+
+Another transaction
+
+Insert row.
+
+Read again
+
+11 rows.
+
+Isolation Levels
+
+READ_UNCOMMITTED
+
+READ_COMMITTED
+
+REPEATABLE_READ
+
+SERIALIZABLE
+
+READ_UNCOMMITTED
+
+Allows
+
+Dirty Read
+
+Fastest
+
+Rare.
+
+READ_COMMITTED
+
+Prevents dirty read.
+
+Allows
+
+Non-repeatable
+
+Phantom.
+
+Default in Oracle/PostgreSQL.
+
+REPEATABLE_READ
+
+Prevents
+
+Dirty
+
+Non-repeatable
+
+Allows phantom.
+
+Default in MySQL(InnoDB).
+
+SERIALIZABLE
+
+Highest isolation.
+
+Everything locked.
+
+Slowest.
+
+Example
+
+@Transactional(
+isolation = Isolation.SERIALIZABLE)
+Read Only
+@Transactional(readOnly = true)
+
+Benefits
+
+Hibernate skips dirty checking
+
+Less overhead
+
+Optimized queries
+
+Should use
+
+GET APIs
+Timeout
+@Transactional(timeout = 5)
+
+If transaction exceeds
+
+5 seconds
+
+↓
+
+Rollback
+Self Invocation Problem
+
+Most asked.
+
+Example
+
+@Service
+class UserService {
+
+    public void outer() {
+        inner();
+    }
+
+    @Transactional
+    public void inner() {
+
+    }
+
+}
+
+Will transaction work?
+
+NO.
+
+Why?
+
+Because
+
+outer()
+
+↓
+
+this.inner()
+
+↓
+
+No proxy involved
+
+Proxy only intercepts external calls.
+
+Correct
+
+Controller
+
+↓
+
+Proxy
+
+↓
+
+Service
+
+↓
+
+Transaction
+
+Wrong
+
+this.inner()
+
+↓
+
+No proxy
+
+↓
+
+No transaction
+
+Solutions
+
+Move inner() to another Spring bean.
+Inject the proxied bean into itself (less common).
+Use AopContext.currentProxy() if proxy exposure is enabled (generally avoided unless necessary).
+Private Method Problem
+@Transactional
+private void save() {
+
+}
+
+Works?
+
+NO.
+
+Proxy cannot intercept private methods.
+
+Final Method
+@Transactional
+final void save(){
+
+}
+
+Usually doesn't work with CGLIB proxies because final methods cannot be overridden.
+
+Static Method
+
+Never works.
+
+Interface vs Class
+
+Spring can create
+
+JDK Proxy
+
+or
+
+CGLIB Proxy
+
+JDK
+
+Interface required
+
+CGLIB
+
+Subclass
+
+Spring Boot nowadays often uses CGLIB by default, but understanding both is valuable.
+
+LazyInitializationException
+
+Interview favorite.
+
+Example
+
+User user = repository.findById(1);
+
+return user.getOrders();
+
+Outside transaction
+
+Session closed
+
+↓
+
+LazyInitializationException
+
+Because
+
+Orders
+
+not loaded.
+
+Solutions
+
+Access the lazy collection within the transaction.
+Use JOIN FETCH or an entity graph when appropriate.
+Map entities to DTOs inside the transactional service layer.
+
+Avoid relying on the Open Session in View pattern as a general fix.
+
+Transaction and Flush
+
+Commit
+
+↓
+
+Flush
+
+↓
+
+Commit DB
+
+Hibernate first
+
+Flushes SQL
+
+↓
+
+Commit
+
+Flush means
+
+Synchronize persistence context
+
+↓
+
+Database
+
+It does not necessarily commit.
+
+Multiple Database Calls
+@Transactional
+
+public void save(){
+
+repo.save(a);
+
+repo.save(b);
+
+repo.save(c);
+
+}
+
+One transaction.
+
+If
+
+repo.save(c)
+
+fails
+
+Everything rolls back.
+
+What if you catch exception?
+@Transactional
+public void save(){
+
+    try{
+
+        repo.save();
+
+        throw new RuntimeException();
+
+    }catch(Exception e){
+
+    }
+
+}
+
+Rollback?
+
+No. Because the exception never leaves the method, Spring believes everything completed successfully and commits.
+
+To force rollback after catching:
+
+TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+or rethrow the exception.
+
+@Transactional on Controller?
+
+Bad practice.
+
+Transaction should stay in
+
+Service Layer
+
+Not
+
+Controller
+@Transactional on Repository?
+
+Usually unnecessary.
+
+Service should define transaction boundaries.
+
+Can async method share transaction?
+@Transactional
+
+public void save(){
+
+asyncMethod();
+
+}
+
+No.
+
+@Async executes in another thread.
+
+Transactions are thread-local.
+
+Common Production Issues
+1. Self Invocation
+
+No transaction.
+
+2. Catching exception
+
+No rollback.
+
+3. Long transaction
+
+Locks database.
+
+Performance drops.
+
+4. Calling external API inside transaction
+
+Bad.
+
+@Transactional
+
+save();
+
+callPaymentGateway();
+
+Suppose payment takes
+
+20 seconds
+
+Database lock held for
+
+20 seconds
+
+Bad design.
+
+Better
+
+Save
+
+Commit
+
+Call API
+
+Update status
+
+or use an asynchronous/event-driven pattern.
+
+5. Huge batch insert
+
+One transaction
+
+100000 inserts
+
+Consumes lots of memory.
+
+Instead
+
+Insert
+
+Flush
+
+Clear
+
+Repeat
+Interview Questions (with Ideal Answers)
+Q1. How does @Transactional work internally?
+
+It is implemented using Spring AOP. A proxy intercepts the method call, starts a transaction through the PlatformTransactionManager, executes the business logic, and then commits or rolls back depending on the outcome.
+
+Q2. Why doesn't @Transactional work on private methods?
+
+Because Spring's proxy cannot intercept calls to private methods.
+
+Q3. Why doesn't it work with self-invocation?
+
+A call like this.method() bypasses the Spring proxy, so the transaction interceptor never runs.
+
+Q4. Why don't checked exceptions trigger rollback?
+
+By default, Spring only rolls back for RuntimeException and Error. Use rollbackFor to include checked exceptions.
+
+Q5. Difference between flush() and commit()?
+Flush	Commit
+Sends SQL statements to the database	Permanently commits the transaction
+Can happen multiple times	Happens once per transaction
+Changes can still be rolled back	Cannot be rolled back after commit
+Q6. Difference between REQUIRED and REQUIRES_NEW?
+REQUIRED	REQUIRES_NEW
+Joins an existing transaction if one exists	Always starts a new transaction
+Default propagation	Suspends the current transaction
+Rolls back together with the outer transaction	Commits or rolls back independently
+What interviewers expect from a 10-year Java developer
+
+You should be able to explain:
+
+What Spring AOP proxies do for @Transactional
+The role of PlatformTransactionManager
+Transaction propagation and when to use each type
+Isolation levels and concurrency anomalies
+Why self-invocation breaks transactions
+Why private/final/static methods are problematic
+JPA persistence context, dirty checking, flush() vs commit()
+Common production pitfalls (long-running transactions, external API calls, caught exceptions)
+When to use readOnly, rollbackFor, timeout, and REQUIRES_NEW

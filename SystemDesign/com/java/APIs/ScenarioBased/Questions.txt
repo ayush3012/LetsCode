@@ -1,0 +1,2515 @@
+1.A customer reports duplicate orders. Where would you start investigating?
+   Sample Interview Answer
+
+   "I would first determine whether the duplicate order was caused by the client, the network, the application, or downstream services. I'd trace the complete request flow from the API gateway to the database."
+
+   Then investigate in this order:
+
+   1. Check Whether the Client Sent Multiple Requests
+
+   Questions:
+
+   Did the user double-click the "Place Order" button?
+   Did the mobile app retry?
+   Did the browser resend after a timeout?
+   Did the load balancer retry?
+
+   Look at:
+
+   API Gateway logs
+   Access logs
+   Request timestamps
+   Request IDs
+
+   Example:
+
+   POST /orders
+   10:10:15.123
+
+   POST /orders
+   10:10:15.500
+
+   If two requests arrived from the client, the issue may be outside your service.
+
+   2. Check for an Idempotency Key
+
+   For order/payment APIs, every request should have something like:
+
+   Idempotency-Key:
+   abc123xyz
+
+   Flow:
+
+   Receive Request
+         │
+         ▼
+   Check Redis/DB
+         │
+   Already Exists?
+      │        │
+    Yes       No
+    │          │
+   Return     Process Order
+   Previous   Save Key
+   Response
+
+   If no idempotency mechanism exists, duplicate requests can create duplicate orders.
+
+   3. Check Application Logs
+
+   Trace the request using:
+
+   Correlation ID
+   Request ID
+   Trace ID (e.g., OpenTelemetry/Zipkin)
+
+   Questions:
+
+   Was the controller called twice?
+   Was the service method executed twice?
+   Were there two database inserts?
+
+   Example log:
+
+   RequestId = abc123
+
+   Controller
+   ↓
+
+   OrderService
+
+   ↓
+
+   Repository.save()
+
+   If this sequence appears twice for the same request ID, investigate why.
+
+   4. Check the Database
+
+   Run queries like:
+
+   SELECT customer_id,
+          product_id,
+          created_at,
+          COUNT(*)
+   FROM orders
+   GROUP BY customer_id, product_id, created_at
+   HAVING COUNT(*) > 1;
+
+   Look for:
+
+   Same customer
+   Same cart
+   Same payment
+   Same order amount
+   Nearly identical timestamps
+   5. Check Database Constraints
+
+   Is there a unique constraint that should prevent duplicates?
+
+   Example:
+
+   UNIQUE(idempotency_key)
+
+   or
+
+   UNIQUE(payment_id)
+
+   Without appropriate constraints, concurrent requests may both insert rows successfully.
+
+   6. Check Concurrent Requests (Race Condition)
+
+   Two requests might reach the service at nearly the same time:
+
+   Request A
+             \
+              Check "Order Exists" → No
+   Request B /
+               Check "Order Exists" → No
+
+   ↓
+
+   Both insert
+
+   ↓
+
+   Duplicate Orders
+
+   Possible fixes:
+
+   Database unique constraints
+   Optimistic locking
+   Pessimistic locking
+   Idempotency keys
+   7. Check Retry Mechanisms
+
+   Look for automatic retries in:
+
+   HTTP clients
+   Message queues
+   Circuit breakers
+   Retry libraries
+
+   Example:
+
+   POST Order
+
+   Timeout
+
+   Retry
+
+   Original request actually succeeded
+
+   ↓
+
+   Duplicate order
+
+   A timeout does not necessarily mean the original operation failed.
+
+   8. Check Message Queue Behavior
+
+   If using systems like Kafka or RabbitMQ:
+
+   Receive Message
+
+   ↓
+
+   Process
+
+   ↓
+
+   Crash before ACK
+
+   ↓
+
+   Message redelivered
+
+   ↓
+
+   Duplicate Order
+
+   Consumers should be idempotent because "at least once" delivery can produce duplicates.
+
+   9. Check Payment Flow
+
+   Sometimes:
+
+   Payment succeeds
+
+   ↓
+
+   Response timeout
+
+   ↓
+
+   Client retries
+
+   ↓
+
+   New order created
+
+   This is another case where idempotency is essential.
+
+   10. Check Deployment or Infrastructure Issues
+
+   Verify:
+
+   Multiple service instances
+   Sticky session changes (if relevant)
+   Load balancer retries
+   Reverse proxy retries
+   API Gateway retry policies
+   Root Causes You Might Find
+   Root Cause	Solution
+   User clicked twice	Disable button / UI debounce
+   Network retry	Idempotency key
+   Client retry	Idempotency key
+   API Gateway retry	Safe retry configuration
+   Race condition	Locking or unique constraints
+   Duplicate Kafka message	Idempotent consumer
+   Missing unique index	Add database constraint
+   Payment timeout	Idempotent payment processing
+   What Interviewers Want to Hear (Senior-Level)
+
+   A concise senior-level response could be:
+
+   "I would trace the request end-to-end. First, I'd verify whether duplicate requests
+   originated from the client by checking API gateway logs and correlation IDs.
+   Next, I'd inspect the service logs to see if the request was processed twice or retried.
+    I'd verify whether idempotency keys are implemented and enforced, then examine the database
+    for duplicate inserts and ensure appropriate unique constraints exist. If the service is asynchronous,
+     I'd investigate message redelivery and consumer idempotency. Finally, I'd review retry policies,
+      timeouts, and any race conditions caused by concurrent requests. My goal is to identify whether
+      the duplication originated at the client, network, application, database, or messaging layer."
+ ========================================================================================================
+ 2. Your API latency jumps from 200ms to 5s after deployment. Why?
+
+ Sample Interview Answer
+
+ "Since the latency increased immediately after deployment, I'd first assume the deployment introduced the issue. I would compare the new release with the previous version and use monitoring tools, logs, and metrics to identify where the extra time is being spent."
+
+ Step 1: Confirm the Problem
+
+ First verify:
+
+ Is it affecting all APIs or only one?
+ Is it affecting all users or a subset?
+ Did it start exactly after deployment?
+ Did rollback fix the issue?
+
+ If rollback immediately restores latency to 200 ms, the new deployment is the likely cause.
+
+ Step 2: Check Application Metrics
+
+ Using tools like Prometheus/Grafana, Datadog, or New Relic, check:
+
+ Response time (P50, P95, P99)
+ Throughput (Requests/sec)
+ Error rate
+ CPU usage
+ Memory usage
+ Garbage Collection time
+ Active threads
+ Thread pool queue size
+
+ Example:
+
+ Before Deployment
+ Latency : 200 ms
+ CPU : 40%
+
+ After Deployment
+ Latency : 5 sec
+ CPU : 95%
+
+ High CPU may indicate inefficient code or excessive computation.
+
+ Step 3: Identify Where Time Is Spent
+
+ Break the request into components:
+
+ API Request
+      │
+      ▼
+ Authentication (20 ms)
+      │
+ Business Logic (40 ms)
+      │
+ Database (4.5 sec)  ← Problem
+      │
+ Response
+
+ Distributed tracing (OpenTelemetry, Zipkin, Jaeger) helps pinpoint the slow component.
+
+ Step 4: Check Database Performance
+
+ Common causes:
+
+ Missing index
+ N+1 queries
+ Full table scans
+ Slow joins
+ Connection pool exhaustion
+
+ Example:
+
+ Before:
+
+ SELECT * FROM orders WHERE id = ?;
+
+ After deployment:
+
+ SELECT * FROM orders;
+
+ A small query change can increase latency dramatically.
+
+ Step 5: Check External Service Calls
+
+ Maybe a downstream service became slow.
+
+ User API
+
+ ↓
+
+ Payment Service (4 seconds)
+
+ ↓
+
+ Response
+
+ Questions:
+
+ Are downstream services healthy?
+ Are retries occurring?
+ Are timeouts configured correctly?
+ Step 6: Check Thread Pool Saturation
+
+ For example:
+
+ ExecutorService
+
+ Pool Size = 20
+
+ Active Threads = 20
+
+ Queue Size = 500
+
+ If all worker threads are busy, new requests wait in the queue, increasing latency.
+
+ Step 7: Check Connection Pools
+
+ Examples:
+
+ Database connection pool (HikariCP)
+ Redis connection pool
+ HTTP client connection pool
+
+ Symptoms:
+
+ Waiting for DB Connection
+
+ 4 seconds
+
+ A pool that's too small or leaking connections can slow every request.
+
+ Step 8: Check Garbage Collection
+
+ If memory usage increased:
+
+ Old GC
+
+ 100 ms
+
+ ↓
+
+ New GC
+
+ 3 seconds
+
+ Long GC pauses can significantly increase latency.
+
+ Step 9: Check Configuration Changes
+
+ Examples:
+
+ Debug logging enabled
+ Reduced thread pool size
+ Changed JVM options
+ Disabled caching
+ Different environment variables
+
+ Sometimes configuration changes, not code, cause the regression.
+
+ Step 10: Compare the Code Changes
+
+ Review the deployment for:
+
+ New loops
+ New API calls
+ Synchronous code replacing asynchronous code
+ Additional database queries
+ New locking or synchronization
+
+ Example:
+
+ Old:
+
+ CompletableFuture.allOf(userFuture, paymentFuture).join();
+
+ New:
+
+ userService.get();
+ paymentService.get();
+
+ Parallel execution became sequential, increasing response time.
+
+ Common Root Causes
+ Cause	Effect
+ Missing DB index	Slow queries
+ N+1 queries	Many database calls
+ External service slowdown	Long waits
+ Thread pool exhaustion	Requests queued
+ Connection pool exhaustion	Waiting for connections
+ GC pauses	Stop-the-world delays
+ Debug logging	Increased I/O
+ Cache disabled	More database access
+ Network/DNS issues	Slow external calls
+ Code regression	Less efficient execution
+ Interview-Ready Answer (2 Minutes)
+
+ "Since the issue started immediately after deployment, I'd first verify that a rollback restores
+ normal latency. Then I'd check monitoring dashboards for CPU, memory, GC, thread pools, and database metrics.
+  Using distributed tracing, I'd identify whether the delay is in business logic, database access,
+  or downstream services. I'd also review slow SQL queries, connection pool usage, thread pool saturation,
+   and retry behavior. Finally, I'd compare the deployed code and configuration with the previous release
+    to identify regressions, such as missing indexes, additional database calls, synchronous execution
+     replacing parallel calls, or disabled caching. This structured approach helps isolate the bottleneck
+      rather than guessing the cause."
+
+ Follow-up questions you should be prepared for
+ How would you identify an N+1 query problem?
+ How do you analyze a thread dump when latency is high?
+ How can you determine whether the bottleneck is CPU-bound or I/O-bound?
+ What metrics would you monitor in HikariCP?
+ How would you investigate high GC pauses in a Spring Boot application?
+
+  ========================================================================================================
+3.How would you identify an N+1 query problem?
+First, what is an N+1 Query Problem?
+
+Suppose you have two entities:
+
+@Entity
+public class Department {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department")
+    private List<Employee> employees;
+}
+@Entity
+public class Employee {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @ManyToOne
+    private Department department;
+}
+
+Assume the database contains:
+
+Department
+-----------
+IT
+HR
+Finance
+
+Employee
+---------
+John -> IT
+David -> IT
+Alex -> HR
+Sam -> Finance
+Code
+List<Department> departments = departmentRepository.findAll();
+
+for (Department department : departments) {
+    System.out.println(department.getEmployees().size());
+}
+
+Looks harmless.
+
+What Happens Internally?
+Query 1
+SELECT * FROM department;
+
+Returns
+
+IT
+HR
+Finance
+
+Now inside the loop
+
+department.getEmployees()
+
+Hibernate loads employees lazily.
+
+For IT
+
+SELECT * FROM employee
+WHERE department_id = 1;
+
+For HR
+
+SELECT * FROM employee
+WHERE department_id = 2;
+
+For Finance
+
+SELECT * FROM employee
+WHERE department_id = 3;
+
+Total Queries
+
+1 query for departments
+
++
+
+3 queries for employees
+
+=
+
+4 queries
+
+Formula
+
+1 + N
+
+If there are
+
+100 departments
+
+Then
+
+1 + 100
+
+=
+
+101 SQL Queries
+
+That's the N+1 problem.
+
+How Do You Identify It?
+1. Enable Hibernate SQL Logging (Most Common)
+
+In application.properties
+
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.orm.jdbc.bind=TRACE
+
+Run the API.
+
+If you see
+
+SELECT * FROM department;
+
+SELECT * FROM employee WHERE department_id=1;
+
+SELECT * FROM employee WHERE department_id=2;
+
+SELECT * FROM employee WHERE department_id=3;
+
+SELECT * FROM employee WHERE department_id=4;
+
+That's an N+1 problem.
+
+2. Look for Repeated SQL
+
+Example logs:
+
+SELECT employee ...
+
+SELECT employee ...
+
+SELECT employee ...
+
+SELECT employee ...
+
+SELECT employee ...
+
+Same query repeated with different IDs.
+
+Huge red flag.
+
+3. Hibernate Statistics
+
+Enable
+
+spring.jpa.properties.hibernate.generate_statistics=true
+
+Example output
+
+Entity fetch count = 100
+
+Query execution count = 101
+
+Very useful in production debugging.
+
+4. Use a SQL Profiler
+
+Popular tools:
+
+P6Spy
+datasource-proxy
+IntelliJ Database Console
+Database query monitor
+APM tools (New Relic, Dynatrace, AppDynamics)
+
+These show exactly how many SQL statements your API executes.
+
+5. Performance Symptoms
+
+Suppose
+
+Departments = 1000
+
+Each employee query takes
+
+5 ms
+
+Total
+
+1000 × 5
+
+=
+
+5000 ms
+
+The API suddenly takes 5–6 seconds instead of a few hundred milliseconds.
+
+How Do You Fix It?
+Solution 1: JOIN FETCH (Most Common)
+
+Repository
+
+@Query("""
+    SELECT d
+    FROM Department d
+    JOIN FETCH d.employees
+    """)
+List<Department> findAllWithEmployees();
+
+Hibernate executes
+
+SELECT *
+FROM department d
+JOIN employee e
+ON d.id = e.department_id;
+
+Only one query.
+
+Solution 2: @EntityGraph
+@EntityGraph(attributePaths = "employees")
+List<Department> findAll();
+
+Spring Data automatically fetches employees.
+
+Solution 3: DTO Projection
+
+Instead of loading entities
+
+SELECT new DepartmentDTO(
+    d.name,
+    e.name
+)
+
+Only required columns are fetched.
+
+Solution 4: Batch Fetching
+spring.jpa.properties.hibernate.default_batch_fetch_size=50
+
+Instead of
+
+SELECT * FROM employee WHERE department_id = 1;
+SELECT * FROM employee WHERE department_id = 2;
+SELECT * FROM employee WHERE department_id = 3;
+
+Hibernate may execute
+
+SELECT *
+FROM employee
+WHERE department_id IN (1,2,3,...50);
+
+Much fewer queries.
+
+Interview Trick Question
+
+Suppose someone changes
+
+@OneToMany(fetch = FetchType.LAZY)
+
+to
+
+@OneToMany(fetch = FetchType.EAGER)
+
+Will it solve the N+1 problem?
+
+Answer: No, not necessarily.
+
+EAGER means Hibernate tries to load the association automatically, but depending on the query,
+it may still execute one query for the parent entities and additional queries for each child collection.
+ EAGER does not guarantee a single SQL statement.
+
+A JOIN FETCH or @EntityGraph explicitly tells Hibernate to retrieve the association in one query.
+
+Interview Answer (1 Minute)
+
+"I identify an N+1 query problem by enabling Hibernate SQL logs or using tools like P6Spy or Hibernate
+Statistics. If I see one query fetching the parent entities followed by repeated queries fetching child
+ entities with different IDs, that's a classic N+1 pattern. The repeated SQL and unusually high query
+ count are strong indicators. I typically fix it using JOIN FETCH or @EntityGraph, and for some cases
+ I use DTO projections or batch fetching depending on the use case."
+
+ A concise decision table demonstrates mature thinking:
+
+ Scenario	Recommended Approach
+ 5 employees per department	JOIN FETCH
+ 100 employees	JOIN FETCH or @EntityGraph (depending on the use case)
+ 10,000 employees	Separate paginated query, DTO projection, or batch fetching
+ Dashboard showing only department names	Fetch only departments (no employee collection)
+ Dashboard showing employee count	DTO projection with COUNT()
+ REST endpoint returning department with all employees	Only if the collection is reasonably small;
+  otherwise redesign the API to page the employees
+
+  | Scenario                                              | Recommended Approach                                                                         |
+  | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+  | 5 employees per department                            | `JOIN FETCH`                                                                                 |
+  | 100 employees                                         | `JOIN FETCH` or `@EntityGraph` (depending on the use case)                                   |
+  | 10,000 employees                                      | Separate paginated query, DTO projection, or batch fetching                                  |
+  | Dashboard showing only department names               | Fetch only departments (no employee collection)                                              |
+  | Dashboard showing employee count                      | DTO projection with `COUNT()`                                                                |
+  | REST endpoint returning department with all employees | Only if the collection is reasonably small; otherwise redesign the API to page the employees |
+========================================================================================================
+How do you analyze a thread dump when latency is high?
+Step 1: Take a Thread Dump
+
+Common ways:
+
+Linux
+jstack <PID> > threaddump.txt
+
+Find PID
+
+jps -l
+Java 21+
+jcmd <PID> Thread.print
+Kubernetes
+kubectl exec -it pod-name -- jcmd <PID> Thread.print
+Windows
+jstack PID
+Step 2: Don't Take Only One Dump
+
+This is a common interview mistake.
+
+Take 3–5 thread dumps.
+
+Example
+
+12:00:00
+
+↓
+
+12:00:10
+
+↓
+
+12:00:20
+
+Why?
+
+Because one dump is just a snapshot.
+
+Multiple dumps tell you whether threads are progressing or stuck.
+
+Step 3: Open the Dump
+
+You'll see something like:
+
+"http-nio-8080-exec-12"
+
+State: BLOCKED
+
+at AccountService.transfer()
+
+or
+
+"http-nio-8080-exec-5"
+
+State: WAITING
+Step 4: Look at Thread States
+
+There are six important states.
+
+RUNNABLE
+RUNNABLE
+
+Means
+
+Thread is
+
+executing
+or ready for CPU
+
+Too many RUNNABLE threads can indicate:
+
+infinite loops
+high CPU usage
+busy waiting
+BLOCKED
+BLOCKED
+
+Waiting for a monitor lock.
+
+Example
+
+synchronized(account){
+
+}
+
+Another thread owns the lock.
+
+High BLOCKED count usually indicates:
+
+synchronized bottleneck
+lock contention
+WAITING
+WAITING
+
+Waiting indefinitely.
+
+Examples
+
+Object.wait()
+
+Thread.join()
+
+LockSupport.park()
+
+Usually normal for thread pools.
+
+TIMED_WAITING
+TIMED_WAITING
+
+Examples
+
+Thread.sleep()
+
+Future.get(10 sec)
+
+await()
+
+Usually normal unless too many request threads are sleeping or waiting on slow downstream calls.
+
+NEW
+
+Rarely useful in production.
+
+TERMINATED
+
+Thread already finished.
+
+Example Thread Dump
+"http-nio-8080-exec-10"
+
+java.lang.Thread.State: BLOCKED
+
+waiting to lock
+
+<Account@123>
+
+owned by
+
+"http-nio-8080-exec-5"
+
+Interpretation
+
+Request A
+
+↓
+
+Holding Lock
+
+↓
+
+Request B
+
+↓
+
+Waiting
+
+↓
+
+Latency Increased
+Step 5: Look for Deadlock
+
+Thread dump may contain
+
+Found one Java-level deadlock
+
+Example
+
+Thread A
+
+↓
+
+Lock Account
+
+↓
+
+Waiting Card
+
+Thread B
+
+Lock Card
+
+↓
+
+Waiting Account
+
+Neither can continue.
+
+Step 6: Look for Long Stack Traces
+
+Example
+
+Thread State
+
+RUNNABLE
+
+↓
+
+JDBC
+
+↓
+
+Socket Read
+
+↓
+
+MySQL
+
+Means
+
+Application is waiting on the database.
+
+The issue may not be in Java code.
+
+Another
+
+RestTemplate.execute()
+
+↓
+
+Socket Read
+
+External service is slow.
+
+Step 7: Look for Thread Pool Starvation
+
+Example
+
+http-nio-8080-exec
+
+200 Threads
+
+↓
+
+All WAITING
+
+↓
+
+Future.get()
+
+Suppose every request does
+
+Future.get();
+
+All request threads become blocked.
+
+Eventually
+
+Tomcat Thread Pool
+
+↓
+
+No Free Thread
+
+↓
+
+Requests Queue
+
+↓
+
+Latency Increases
+Step 8: Check Executor Threads
+
+Suppose
+
+Executors.newFixedThreadPool(5)
+
+Thread dump
+
+pool-1-thread-1
+
+RUNNING
+
+pool-1-thread-2
+
+RUNNING
+
+pool-1-thread-3
+
+RUNNING
+
+pool-1-thread-4
+
+RUNNING
+
+pool-1-thread-5
+
+RUNNING
+
+Queue
+
+500 Tasks
+
+Problem
+
+Pool too small.
+
+Step 9: Analyze Repeated Dumps
+
+Suppose
+
+Dump 1
+
+Thread A
+
+at transfer()
+
+Dump 2
+
+Thread A
+
+at transfer()
+
+Dump 3
+
+Thread A
+
+at transfer()
+
+Same line.
+
+Same stack.
+
+Thread is stuck.
+
+If
+
+Dump 1
+
+transfer()
+
+Dump 2
+
+save()
+
+Dump 3
+
+publishEvent()
+
+Thread is making progress.
+
+Common Things I Look For
+1. Deadlock
+BLOCKED
+
+Waiting forever
+2. Lock Contention
+
+Many threads
+
+BLOCKED
+
+Same lock
+3. Database Waiting
+SocketInputStream.read()
+
+Likely slow DB.
+
+4. External API
+RestTemplate.execute()
+
+Socket Read
+
+External dependency issue.
+
+5. Infinite Loop
+RUNNABLE
+
+Same line
+
+Across all dumps
+
+High CPU.
+
+6. Thread Pool Exhaustion
+http-nio
+
+All Busy
+
+No worker available.
+
+Useful Tools
+
+Instead of reading raw dumps manually:
+
+fastThread.io (excellent for visualization)
+IBM Thread and Monitor Dump Analyzer (TMDA)
+Eclipse Memory Analyzer (if investigating memory along with threads)
+VisualVM
+JDK Mission Control (JMC)
+
+These tools highlight blocked threads, deadlocks, and repeated stack traces.
+
+Real Production Example
+
+A payment API became slow.
+
+Thread dump showed
+
+200 Tomcat Threads
+
+↓
+
+WAITING
+
+↓
+
+Future.get()
+
+↓
+
+Payment Service
+
+Root cause
+
+Developer used
+
+future.get();
+
+without timeout.
+
+Payment service became slow.
+
+Every Tomcat thread waited.
+
+Eventually
+
+Thread Pool Exhausted
+
+↓
+
+Latency 20 seconds
+
+Fix
+
+future.get(2, TimeUnit.SECONDS);
+
+plus
+
+timeout
+retry
+circuit breaker
+
+Latency dropped dramatically.
+
+Interview Answer (2 Minutes)
+
+"When latency is high, I first capture multiple thread dumps a few seconds apart using jstack or
+ jcmd because a single dump is only a snapshot. I then analyze thread states, looking for excessive
+  BLOCKED threads indicating lock contention, WAITING or TIMED_WAITING threads waiting on slow downstream
+  systems, and many RUNNABLE threads that could indicate CPU-bound work or infinite loops.
+   I check for deadlocks, thread pool exhaustion, repeated stack traces across dumps, and whether
+   threads are blocked on database calls, HTTP clients, or synchronization. If I see request threads
+   waiting on Future.get() or external APIs, I investigate timeouts and resilience mechanisms.
+    Comparing multiple dumps helps distinguish a truly stuck thread from one that's simply making progress."
+ =========================================================================================================
+
+  A Kafka consumer is running, but messages are not being processed.?
+  Sample Interview Answer
+
+  "I would trace the message flow from the producer to the consumer. First, I'd verify whether messages are reaching the Kafka topic, then confirm the consumer is part of the correct consumer group, has assigned partitions, is polling successfully, and is not failing during message processing."
+
+  Step 1: Check if Messages Are Actually in the Topic
+
+  First question:
+
+  Did the producer successfully publish the message?
+
+  Check:
+
+  Producer logs
+  Kafka UI (AKHQ, Kafka UI, Confluent Control Center)
+  Topic message count
+
+  Example
+
+  Producer
+
+  ↓
+
+  Kafka Topic
+
+  ↓
+
+  Consumer
+
+  If no messages exist, the issue is on the producer side.
+
+  Step 2: Verify Consumer is Running
+
+  Check application logs.
+
+  Example
+
+  Started Kafka Listener
+  Subscribed to topic: orders
+
+  Questions:
+
+  Is the application up?
+  Did KafkaListener start?
+  Any startup exceptions?
+  Step 3: Verify Consumer Group
+
+  Check
+
+  group.id=order-consumer
+
+  Wrong group?
+
+  Wrong topic?
+
+  Wrong cluster?
+
+  A typo like
+
+  orders-topic
+
+  instead of
+
+  order-topic
+
+  will result in no messages being consumed.
+
+  Step 4: Check Partition Assignment
+
+  Run
+
+  kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group order-consumer
+
+  Example
+
+  TOPIC      PARTITION
+  orders     0
+  orders     1
+  orders     2
+
+  If no partitions are assigned, the consumer cannot receive messages.
+
+  Possible reasons:
+
+  Consumer hasn't joined the group
+  More consumers than partitions
+  Consumer is stuck during rebalance
+  Step 5: Check Consumer Lag
+
+  Very important.
+
+  Example
+
+  Current Offset : 100
+
+  Log End Offset : 500
+
+  Lag = 400
+
+  Questions:
+
+  Is lag increasing?
+  Is lag constant?
+  Is it zero?
+
+  Cases:
+
+  Lag = 0
+
+  No new messages.
+
+  Lag keeps increasing
+
+  Consumer isn't processing.
+
+  Lag decreases slowly
+
+  Consumer is slow.
+
+  Step 6: Check Offsets
+
+  Maybe offsets were committed.
+
+  Example
+
+  Latest Offset = 1000
+
+  Committed Offset = 1000
+
+  Consumer thinks everything is already processed.
+
+  Maybe
+
+  auto.offset.reset=latest
+
+  was used.
+
+  If the consumer starts after messages are produced, it skips old messages.
+
+  Sometimes
+
+  earliest
+
+  is required.
+
+  Step 7: Check Exceptions
+
+  Maybe processing fails.
+
+  Example
+
+  @KafkaListener(...)
+  public void consume(Order order) {
+
+      process(order);   // throws exception
+  }
+
+  Look for
+
+  SerializationException
+
+  TimeoutException
+
+  NullPointerException
+
+  CommitFailedException
+
+  Consumer may continuously retry the same message.
+
+  Step 8: Check Deserialization
+
+  Very common.
+
+  Producer sends
+
+  JSON
+
+  Consumer expects
+
+  String
+
+  or
+
+  Avro
+
+  Deserializer mismatch causes failures before the listener executes.
+
+  Step 9: Check Polling
+
+  Kafka consumers must continuously call
+
+  poll()
+
+  In Spring Kafka:
+
+  @KafkaListener
+
+  handles polling automatically.
+
+  If using the raw Kafka client, ensure the polling loop is running.
+
+  Step 10: Check Long Processing Time
+
+  Example
+
+  max.poll.interval.ms = 5 min
+
+  If processing one message takes
+
+  10 minutes
+
+  Kafka assumes the consumer is dead.
+
+  Result:
+
+  Rebalance occurs
+  Another consumer takes the partition
+  Processing becomes unstable
+  Step 11: Check Dead Letter Queue (DLQ)
+
+  Maybe messages are failing and being redirected.
+
+  Example
+
+  Topic
+
+  ↓
+
+  Consumer
+
+  ↓
+
+  Exception
+
+  ↓
+
+  DLQ
+
+  Inspect the DLQ for failed records.
+
+  Step 12: Check Infrastructure
+
+  Verify:
+
+  Kafka broker is healthy
+  Network connectivity
+  DNS resolution
+  SSL/SASL authentication
+  ACL permissions
+  Broker logs
+  Common Root Causes
+  Problem	Symptom
+  Wrong topic	No messages consumed
+  Wrong consumer group	No expected processing
+  No partition assignment	Consumer idle
+  Consumer lag increasing	Consumer not keeping up
+  Offset already committed	Consumer appears idle
+  Deserialization error	Listener never invoked
+  Processing exception	Retries or stuck message
+  Rebalance	Frequent stop/start processing
+  Long processing time	max.poll.interval.ms exceeded
+  Authentication failure	Cannot connect to broker
+  Interview-Ready Answer (2 Minutes)
+
+  "I would start by verifying whether messages are actually reaching the Kafka topic.
+  Then I'd confirm the consumer is running, subscribed to the correct topic, and using the
+  expected consumer group. Next, I'd check partition assignments and consumer lag using Kafka
+  consumer group tools. If the consumer has partitions but isn't processing messages,
+   I'd inspect application logs for deserialization errors, processing exceptions, or commit failures.
+    I'd also verify offset positions, auto.offset.reset configuration, and ensure the consumer
+     isn't stuck due to long processing times causing rebalances. Finally, I'd check broker health,
+     authentication, and network connectivity. This approach helps isolate whether the issue is
+     with the producer, Kafka itself, or the consumer application."
+======================================================================================================
+Why can "@Transactional" fail to roll back changes?
+
+Interview Answer
+
+"@Transactional is implemented using Spring AOP proxies. Rollback can fail if the method is not invoked through the proxy, if the exception type doesn't trigger rollback, or if the transaction boundary is configured incorrectly."
+
+1. Exception is Caught (Most Common)
+Problem
+@Transactional
+public void placeOrder() {
+    try {
+        paymentService.pay();
+    } catch (Exception e) {
+        System.out.println("Ignored");
+    }
+
+    orderRepository.save(order);
+}
+
+Since the exception is caught and not rethrown, Spring assumes the method completed successfully.
+
+Result: Transaction commits.
+
+Fix
+@Transactional
+public void placeOrder() {
+    try {
+        paymentService.pay();
+    } catch (Exception e) {
+        throw e;
+    }
+}
+
+or
+
+TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+2. Checked Exception
+
+By default, Spring rolls back only for:
+
+RuntimeException
+Error
+
+It does not roll back for checked exceptions.
+
+Problem
+@Transactional
+public void placeOrder() throws IOException {
+    throw new IOException();
+}
+
+Result: Transaction commits.
+
+Fix
+@Transactional(rollbackFor = IOException.class)
+
+or
+
+@Transactional(rollbackFor = Exception.class)
+3. Self Invocation (Very Common)
+Problem
+@Service
+public class OrderService {
+
+    public void createOrder() {
+        saveOrder();   // Internal call
+    }
+
+    @Transactional
+    public void saveOrder() {
+        // DB operation
+    }
+}
+
+saveOrder() is called from the same class.
+
+Spring proxy is bypassed.
+
+Result: No transaction is created.
+
+Fix
+
+Call the method through another Spring bean.
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private PaymentService paymentService;
+
+    public void createOrder() {
+        paymentService.saveOrder();
+    }
+}
+4. Method is Private
+
+Spring AOP cannot intercept private methods.
+
+@Transactional
+private void save() {}
+
+Result: Transaction ignored.
+
+5. Method is Final
+
+Spring typically uses proxies to intercept methods.
+
+@Transactional
+public final void save() {}
+
+Depending on the proxy mechanism, final methods may not be interceptable.
+
+6. Object Created Using new
+Problem
+OrderService service = new OrderService();
+service.save();
+
+Not managed by Spring.
+
+No proxy.
+
+No transaction.
+
+Correct:
+
+@Autowired
+private OrderService service;
+7. Wrong Propagation
+
+Example
+
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+
+This suspends any existing transaction.
+
+Similarly, using REQUIRES_NEW creates a separate transaction, so its commit/rollback is independent of the caller.
+
+Understanding propagation is important when explaining unexpected rollback behavior.
+
+8. Asynchronous Execution
+@Transactional
+public void save() {
+
+    CompletableFuture.runAsync(() -> {
+        repository.save(...);
+    });
+}
+
+or
+
+@Async
+
+The transaction is thread-bound.
+
+New thread → New transaction context.
+
+The async code won't participate in the original transaction unless explicitly designed to do so.
+
+9. Multiple Data Sources
+
+If you're using multiple databases:
+
+DB1
+
+DB2
+
+and only one transaction manager is configured, operations on the other data source may not roll back with the first.
+
+10. Transaction Already Committed
+
+Once the transaction commits,
+
+repository.save();
+
+followed later by
+
+throw new RuntimeException();
+
+outside the transaction boundary cannot roll back changes that are already committed.
+
+11. readOnly = true
+@Transactional(readOnly = true)
+
+Some JPA providers optimize for read operations. Although readOnly=true doesn't universally prevent writes,
+ it's not intended for modifying data and can lead to unexpected behavior depending on the persistence
+  provider.
+
+12. Wrong Transaction Manager
+
+Example:
+
+@Transactional("mysqlTransactionManager")
+
+while using a PostgreSQL repository.
+
+The transaction manager must correspond to the resources being managed.
+
+Summary Table
+Scenario	Rollback?	Fix
+RuntimeException	✅ Yes	Default behavior
+Checked Exception	❌ No	rollbackFor
+Exception caught and swallowed	❌ No	Rethrow or mark rollback-only
+Self invocation	❌ No	Call through Spring bean
+Private method	❌ No	Use public/protected method
+new object	❌ No	Let Spring manage the bean
+@Async / new thread	❌ No	Separate transaction or redesign
+Wrong propagation	Depends	Choose correct propagation
+Multiple transaction managers	Depends	Configure correctly
+Transaction already committed	❌ No	Ensure exception occurs within transaction
+Interview-Ready Answer (2 Minutes)
+
+"@Transactional can fail to roll back for several reasons. The most common are: the exception is caught
+and not rethrown, a checked exception is thrown without configuring rollbackFor, the transactional
+method is called from another method in the same class (self-invocation), the method is private or
+not invoked through a Spring-managed proxy, or the work happens in another thread using @Async or
+CompletableFuture. Rollback behavior can also be affected by propagation settings, multiple transaction
+managers, or exceptions occurring after the transaction has already committed. Since Spring implements
+ @Transactional using AOP proxies, understanding the proxy and transaction boundaries is essential."
+=======================================================================================================
+
+How would you investigate a production memory leak?
+
+Interview Answer
+
+"I would first confirm that it is actually a memory leak and not simply high memory usage due to increased traffic. Then I'd use JVM metrics, GC logs, heap dumps, and profiling tools to identify which objects are continuously retained and why they are not being garbage collected."
+
+Step 1: Confirm It's Really a Memory Leak
+
+Look at monitoring dashboards.
+
+Metrics:
+
+Heap Usage
+Non-Heap Usage
+Old Generation Usage
+GC Frequency
+GC Pause Time
+
+Example
+
+Heap Usage
+
+90%
+
+↓
+
+95%
+
+↓
+
+97%
+
+↓
+
+99%
+
+↓
+
+OOM
+
+A memory leak typically shows memory continuously increasing and not returning to normal after Full GC.
+
+Step 2: Check Garbage Collection
+
+Questions:
+
+Is Young GC happening frequently?
+Is Full GC happening repeatedly?
+Does memory decrease after Full GC?
+
+Healthy JVM:
+
+Used Heap
+
+80%
+
+↓
+
+GC
+
+↓
+
+30%
+
+Memory leak:
+
+Used Heap
+
+80%
+
+↓
+
+GC
+
+↓
+
+78%
+
+↓
+
+GC
+
+↓
+
+82%
+
+↓
+
+GC
+
+↓
+
+90%
+
+Objects are surviving GC.
+
+Step 3: Check JVM Metrics
+
+Monitor:
+
+Heap Used
+Heap Committed
+Old Gen
+Survivor Space
+Metaspace
+Thread Count
+
+If only Old Gen keeps increasing, long-lived objects may be leaking.
+
+Step 4: Take a Heap Dump
+
+When memory is high:
+
+jmap -dump:live,format=b,file=heap.hprof <PID>
+
+or
+
+jcmd <PID> GC.heap_dump heap.hprof
+Step 5: Analyze Heap Dump
+
+Use tools:
+
+Eclipse MAT (Memory Analyzer)
+VisualVM
+JProfiler
+YourKit
+
+Look for:
+
+Largest objects
+Dominator Tree
+Retained Heap
+Leak Suspects
+
+Example:
+
+HashMap
+
+↓
+
+20 million entries
+
+Why is the map never cleared?
+
+Step 6: Find Objects Retaining Memory
+
+Instead of asking:
+
+Which object is biggest?
+
+Ask:
+
+Why is this object still reachable?
+
+Example:
+
+Static Cache
+
+↓
+
+HashMap
+
+↓
+
+Customer Objects
+
+↓
+
+Images
+
+↓
+
+2 GB
+
+The static reference prevents garbage collection.
+
+Step 7: Common Causes
+Static Collections
+private static List<Order> orders = new ArrayList<>();
+
+Never cleared.
+
+Unbounded Cache
+Map<String, User> cache = new HashMap<>();
+
+Without eviction:
+
+100
+
+↓
+
+10,000
+
+↓
+
+1,000,000
+
+↓
+
+OOM
+
+Use bounded caches like Caffeine or eviction policies.
+
+ThreadLocal Leak
+ThreadLocal<User> user = new ThreadLocal<>();
+
+Forgot
+
+user.remove();
+
+Common in thread pools.
+
+ExecutorService
+ExecutorService executor =
+Executors.newFixedThreadPool(10);
+
+Never
+
+shutdown();
+
+Can retain queued tasks and associated objects longer than expected.
+
+List Growing Forever
+orders.add(order);
+
+Never removing entries.
+
+Event Listeners
+
+Registered
+
+Never unregistered
+
+Objects stay referenced.
+
+Hibernate Session
+
+Large persistence context
+
+Thousands of entities
+
+Never
+
+clear();
+Large HTTP Sessions
+Session
+
+↓
+
+Shopping Cart
+
+↓
+
+Images
+
+↓
+
+Documents
+
+↓
+
+100 MB
+
+Each user session consumes excessive memory.
+
+Step 8: Thread Dump
+
+Check
+
+jstack <PID>
+
+Questions:
+
+Thread leak?
+Thousands of waiting threads?
+Blocked threads?
+
+Each thread has its own stack memory.
+
+Step 9: Compare Before & After Heap Dumps
+
+Take:
+
+Heap Dump A
+
+↓
+
+10 minutes later
+
+↓
+
+Heap Dump B
+
+Compare retained objects.
+
+Growing object counts often identify the leak.
+
+Step 10: Review Recent Changes
+
+Questions:
+
+New cache?
+New library?
+Recent deployment?
+Large object creation?
+Infinite collection growth?
+
+Memory leaks frequently appear after code changes.
+
+Common Production Causes
+Cause	Symptom
+Static collections	Heap continuously grows
+HashMap never cleared	Memory accumulation
+Cache without eviction	Heap exhaustion
+ThreadLocal leak	Memory retained by pooled threads
+Large Hibernate session	Old Gen growth
+Large HTTP sessions	High heap usage
+Thread leak	Increased native and heap memory
+Message queue backlog	Objects waiting in memory
+File/InputStream not closed	Resource leak (may also contribute to memory pressure)
+Infinite object creation	OutOfMemoryError
+Interview-Ready Answer (2 Minutes)
+
+"I would first verify that the issue is truly a memory leak by checking whether heap usage continues
+ to grow even after Full GC. Then I'd examine JVM metrics such as heap usage, Old Gen utilization, GC
+ frequency, and pause times. If a leak is suspected, I'd capture a heap dump using jcmd or jmap and
+ analyze it with Eclipse MAT or VisualVM, focusing on retained objects, dominator trees, and GC roots
+ to determine why objects remain reachable. I'd also review recent deployments and look for common
+ causes such as static collections, unbounded caches, ThreadLocal misuse, large Hibernate persistence
+ contexts, or growing in-memory queues. Once the retaining reference is identified, I'd fix the code
+ and verify through monitoring that memory stabilizes after garbage collection."
+=================================================================================================
+How would you trace a single request across multiple microservices?
+
+Interview Answer
+
+"I would use distributed tracing with a Correlation ID (or Trace ID) that is generated when the request
+ enters the system. The same Trace ID is propagated to every downstream microservice through HTTP
+ headers or message headers, allowing me to trace the complete request across all services."
+
+Example Flow
+                Client
+                   │
+                   ▼
+            API Gateway
+          TraceId = abc123
+                   │
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+  User Service  Order Service  Payment Service
+      │             │               │
+      ▼             ▼               ▼
+     DB            Kafka          Redis
+
+Every service logs the same Trace ID (abc123).
+
+Step 1: Generate a Trace ID
+
+At the API Gateway:
+
+Incoming Request
+
+↓
+
+Generate Trace ID
+
+↓
+
+abc123
+
+If the client already sends a Trace ID, reuse it; otherwise generate a new one.
+
+Step 2: Propagate the Trace ID
+
+Pass it to downstream services.
+
+Example HTTP header:
+
+X-Correlation-ID: abc123
+
+or
+
+traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-...
+
+Every service forwards the same value.
+
+Step 3: Log the Trace ID
+
+Example log:
+
+INFO
+TraceId=abc123
+
+Received Order Request
+
+Another service:
+
+INFO
+
+TraceId=abc123
+
+Payment Started
+
+Now searching for abc123 shows the complete request path.
+
+Step 4: Use Distributed Tracing
+
+Example trace:
+
+Client
+
+↓
+
+Gateway (20ms)
+
+↓
+
+Order Service (100ms)
+
+↓
+
+Payment Service (4 sec)
+
+↓
+
+Inventory (50ms)
+
+You immediately know the latency is in Payment Service.
+
+Step 5: Use Log Aggregation
+
+Centralized logging with tools like:
+
+ELK/OpenSearch
+Splunk
+Datadog Logs
+
+Search:
+
+TraceId=abc123
+
+Result:
+
+Gateway
+
+↓
+
+Order
+
+↓
+
+Inventory
+
+↓
+
+Payment
+
+↓
+
+Notification
+
+All logs for a single request appear together.
+
+Step 6: Trace Asynchronous Calls
+
+For Kafka:
+
+Producer
+
+↓
+
+Kafka Topic
+
+↓
+
+Consumer
+
+Include the Trace ID in the message headers:
+
+TraceId=abc123
+
+The consumer extracts it and continues logging with the same ID.
+
+Step 7: Database Correlation
+
+While databases don't typically store Trace IDs automatically, applications often log:
+
+TraceId=abc123
+
+SQL Started
+
+SQL Finished
+
+This helps correlate slow queries with a request.
+
+Step 8: Monitor Latency
+
+Distributed tracing shows where time is spent.
+
+Example:
+
+Service	Time
+Gateway	15 ms
+Order	80 ms
+Inventory	25 ms
+Payment	4.5 sec
+
+You can immediately identify the bottleneck.
+
+Tools Used
+
+Common tools include:
+
+OpenTelemetry
+Jaeger
+Zipkin
+Grafana Tempo
+Datadog APM
+New Relic APM
+
+For logging:
+
+ELK Stack / OpenSearch
+Splunk
+Datadog Logs
+Spring Boot Example
+Controller
+@RestController
+public class OrderController {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(OrderController.class);
+
+    @GetMapping("/orders")
+    public String getOrder() {
+
+        log.info("Fetching order");
+
+        return "Success";
+    }
+}
+
+If tracing is configured, the logs may automatically include:
+
+TraceId=abc123
+
+SpanId=xyz789
+
+Fetching order
+Common Production Issues
+Problem	Solution
+Missing Trace ID	Generate at Gateway
+Trace lost between services	Forward HTTP/message headers
+Kafka loses Trace ID	Copy Trace ID into message headers
+Difficult log search	Centralized logging
+Slow request	Distributed tracing identifies bottleneck
+Interview-Ready Answer (2 Minutes)
+
+"I would implement distributed tracing using a Trace ID or Correlation ID. When a request first
+reaches the API Gateway, a Trace ID is generated or propagated from the client. That identifier
+is forwarded to every downstream microservice using HTTP or messaging headers and included in all
+application logs. I would use centralized logging to search by Trace ID and a distributed tracing
+tool such as OpenTelemetry with Jaeger, Zipkin, or Grafana Tempo to visualize the request path and
+latency across services. This allows me to identify where a request failed or which service introduced
+the delay, even when the request spans synchronous REST calls and asynchronous messaging."
+
+Follow-up Questions Interviewers Ask
+1. What's the difference between a Correlation ID and a Trace ID?
+Correlation ID: A business or application identifier used to correlate related logs. Its format is
+application-defined.
+Trace ID: A standardized identifier used in distributed tracing systems (for example, OpenTelemetry).
+ A trace contains one or more spans, each representing an operation.
+2. What is a Span?
+
+A span represents a single unit of work.
+
+Example:
+
+Trace abc123
+
+├── Gateway
+├── Order Service
+├── Payment Service
+└── Database Query
+
+Each operation is a separate span within the same trace.
+
+3. How do you propagate the Trace ID automatically in Spring Boot?
+
+With OpenTelemetry (or Spring Boot Micrometer Tracing in newer Spring Boot versions), instrumentation
+automatically propagates trace context across supported HTTP clients, servers, and messaging frameworks.
+ This reduces the need to manually add headers and keeps logs and traces correlated automatically.
+
+=====================================================================================================
+
+If you had only 15 minutes to identify the root cause of a production incident, what would you check first?
+
+Interview Answer
+
+"With only 15 minutes, my goal is not to investigate every possibility but to quickly identify the component causing the issue and restore service if possible. I would first determine the scope of the incident, identify what changed, and use monitoring to locate the bottleneck before diving into detailed debugging."
+
+My 15-Minute Production Incident Checklist
+Minute 1–2: Understand the Impact
+
+Ask:
+
+Is the issue affecting all users or only some?
+Which APIs or services are impacted?
+Is this a complete outage or just slow responses?
+When did it start?
+
+Example:
+
+Deployment at 10:00 AM
+
+↓
+
+Latency increased at 10:02 AM
+
+↓
+
+Likely deployment-related
+
+This immediately narrows the investigation.
+
+Minute 2–4: What Changed?
+
+The first question I ask is:
+
+"What changed?"
+
+Check:
+
+New deployment
+Configuration changes
+Feature flags
+Infrastructure changes
+Database changes
+Certificate renewal
+DNS updates
+
+In production, many incidents are triggered by a recent change.
+
+Minute 4–6: Check Monitoring Dashboard
+
+Look at key metrics:
+
+Error Rate (5xx)
+API Latency (P95/P99)
+CPU
+Memory
+Garbage Collection
+Request Volume
+Thread Pool Usage
+Database Connection Pool
+Kafka Consumer Lag (if applicable)
+
+Example:
+
+CPU = 30%
+
+Memory = 45%
+
+DB Connections = 100% (Pool Exhausted)
+
+↓
+
+Likely database bottleneck
+
+Monitoring often points directly to the failing component.
+
+Minute 6–8: Check Application Logs
+
+Search for:
+
+Exceptions
+Timeouts
+Database errors
+OutOfMemoryError
+Connection refused
+Authentication failures
+
+Always use:
+
+Trace ID
+Correlation ID
+
+to follow one failing request.
+
+Minute 8–10: Check Dependencies
+
+Many production issues originate outside the service.
+
+Verify:
+
+Application
+
+↓
+
+Database
+
+↓
+
+Redis
+
+↓
+
+Kafka
+
+↓
+
+Payment Service
+
+↓
+
+Authentication Service
+
+One unhealthy dependency can impact the entire application.
+
+Minute 10–12: Infrastructure Health
+
+Check:
+
+Pod status
+Restarts
+CrashLoopBackOff
+Readiness/Liveness probes
+Load Balancer
+API Gateway
+Kubernetes events
+
+Example:
+
+Pod
+
+↓
+
+Readiness Failed
+
+↓
+
+No Healthy Endpoint
+
+↓
+
+503
+Minute 12–15: Mitigate
+
+If the root cause is identified:
+
+Possible actions:
+
+Roll back deployment
+Scale replicas
+Restart unhealthy pods
+Disable feature flag
+Increase connection pool (if safe)
+Fail over to a healthy instance
+
+Restoring service is often more important than finding the perfect root cause during the incident.
+
+Priority Order (What I'd Check First)
+Priority	Check	Why
+1	Recent deployments/config changes	Most incidents follow a change
+2	Monitoring dashboards	Quickly identifies the bottleneck
+3	Application logs	Reveals exceptions and failures
+4	Infrastructure health	Pod, container, load balancer issues
+5	Downstream dependencies	DB, Kafka, Redis, external APIs
+6	Rollback decision	Fastest recovery if change caused the issue
+Things I Would NOT Do Immediately
+
+❌ Read the entire codebase
+
+❌ Restart every service without evidence
+
+❌ Increase JVM heap without identifying the cause
+
+❌ Guess the root cause
+
+Instead, I rely on metrics and evidence to guide the investigation.
+
+Interview-Ready Answer (2 Minutes)
+
+"If I had only 15 minutes, I'd focus on quickly identifying the failing component rather than performing
+deep analysis. First, I'd determine the scope of the impact and check whether a recent deployment or
+configuration change coincided with the incident. Next, I'd review monitoring dashboards for latency,
+error rates, CPU, memory, GC, thread pools, and database connection pools to locate the bottleneck.
+I'd then inspect application logs using correlation or trace IDs to identify exceptions or timeout patterns.
+ After that, I'd verify the health of infrastructure components like Kubernetes pods, readiness probes,
+  load balancers, and downstream services such as databases, Kafka, Redis, or external APIs.
+   If a recent deployment is clearly responsible and rollback is low risk, I'd recommend rolling back
+   to restore service while continuing the root cause analysis."
+
+Interview Bonus
+
+A strong closing statement is:
+
+"During an incident, my priority is: Stabilize the service first, identify the root cause second,
+and implement a permanent fix third."
