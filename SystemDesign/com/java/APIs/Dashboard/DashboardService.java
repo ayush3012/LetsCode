@@ -1,4 +1,4 @@
-package SystemDesign.com.java.DashBoardAPI;
+package SystemDesign.com.java.APIs.Dashboard;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;

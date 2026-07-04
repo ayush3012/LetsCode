@@ -1,14 +1,14 @@
-package SystemDesign.com.java.DashBoardAPI;
+package SystemDesign.com.java.APIs.Dashboard;
 
-public class PaymentService {
-    public Payment getPayment(Long id) {
+public class UserService {
+    public User getUser(Long id) {
 
         sleep(3000);
 
         System.out.println(Thread.currentThread().getName()
-                + " -> Payment Service");
+                + " -> User Service");
 
-        return new Payment(id, 5000);
+        return new User(id, "Ayush");
     }
 
     private void sleep(long ms) {

@@ -1,4 +1,4 @@
-package SystemDesign.com.java.DashBoardAPI;
+package SystemDesign.com.java.APIs.Dashboard;
 
 public class DashboardResponse {
     private User user;

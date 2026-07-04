@@ -1,4 +1,4 @@
-package SystemDesign.com.java.DashBoardAPI;
+package SystemDesign.com.java.APIs.Dashboard;
 
 public class RewardService {
     public Reward getReward(Long id) {
