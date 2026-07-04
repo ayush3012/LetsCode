@@ -22,10 +22,13 @@ public class CoinChange {
 		}
 		if(sum<0)
 			return;
-		for(int i=0;i<coins.length;i++)
+		for(int i=start;i<coins.length;i++)
 		{
 			combination.add(coins[i]);
 			coinHelper(coins, sum-coins[i], i, combination, result);
+			//coinHelper(coins, sum-coins[i], i+1, combination, result);-> it will skip the current pile
+			// if we have to find subset/combination then we can use this approach
+			// not for subarray-> it is contigious and above approach chooses random element to make sum
 			combination.remove(combination.size()-1);
 		}
 	}
