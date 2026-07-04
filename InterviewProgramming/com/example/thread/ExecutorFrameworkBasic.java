@@ -505,3 +505,20 @@ What happens if a CompletableFuture task throws an exception and you never call 
 The exception is stored in the future. It won't automatically be thrown on another thread. If you never inspect the future or attach an exception handler, the failure can go unnoticed.
 
 * */
+
+/*
+*
+* ExecutorService executor = new ThreadPoolExecutor(
+        2,                              // Core pool size
+        5,                              // Maximum pool size
+        60,                             // Keep alive time
+        TimeUnit.SECONDS,               // Time unit
+        new ArrayBlockingQueue<>(100),  // Work queue
+        Executors.defaultThreadFactory(), // Thread factory
+        new ThreadPoolExecutor.CallerRunsPolicy() // Rejection policy
+);
+*
+* it initially created only 2 thread( core pool size), if task exceeds in ArrayBlockingQueue (here more than
+* 100) then more thread upto max pool size will be created and if task continues to grow then it uses
+* RejectedExecutionPolicy . by default is abort policy
+* */
