@@ -22,7 +22,7 @@ public class LongestIncreasingSubsequence300 {
         List<Integer> al=new ArrayList<>();
         for(int a:nums)
         {
-            int x=binarySearch(al,a);
+            int x=binarySearch(al,a);  //it is calculating index of a or index of just greater than a
             if(x==al.size())
                 al.add(a);
             else al.set(x,a);
