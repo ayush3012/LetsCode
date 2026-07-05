@@ -31,6 +31,23 @@ public class DecodeString {
         }
 
     }
+
+    static void countWays(String s)
+    {
+        if(s==null || s.isEmpty() || s.charAt(0)=='0')
+            return;
+        int[] dp=new int[s.length()+1];
+        dp[0]=1;
+        dp[1]=1;
+        for(int i=2;i<=s.length();i++)
+        {
+            int one=s.charAt(i-1)-'0';
+            int two=(s.charAt(i-2)-'0')*10+one;
+            if(one>0) dp[i]+=dp[i-1];
+            if(two>=10 && two<=26) dp[i]+=dp[i-2];
+        }
+        System.out.println(dp[s.length()]);
+    }
     public static void main(String[] args)
     {
         String s="123";
@@ -39,6 +56,9 @@ public class DecodeString {
 
         decode(s,0,"",res);
 
-        res.forEach(i-> System.out.println(i));
+        res.forEach(System.out::println);
+
+
+        countWays(s);
     }
 }
