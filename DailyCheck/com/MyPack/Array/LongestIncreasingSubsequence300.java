@@ -15,7 +15,7 @@ public class LongestIncreasingSubsequence300 {
             else if(al.get(mid)<num) l=mid+1;
             else return mid;
         }
-        return l;
+        return l; //l returns index of num or just greater than num ,r return index of just smaller than num
     }
     static void LIS(int[] nums)
     {
