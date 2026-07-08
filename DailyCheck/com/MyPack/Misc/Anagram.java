@@ -35,7 +35,11 @@ public class Anagram {
 		
 		return tm1.entrySet().stream().allMatch(i->tm2.containsKey(i.getKey()) && tm2.get(i.getKey())==i.getValue());
 	}
-	
+
+	static boolean isAnagram1(String s1,String s2)
+	{
+		return Arrays.equals(s1.chars().sorted().toArray(), s2.chars().sorted().toArray());
+	}
 
 	public static void main(String[] args) {
 		
@@ -47,6 +51,8 @@ public class Anagram {
 		System.out.println("==========");
 		
 		System.out.println(isAnagram(s1, s2));
+
+		System.out.println(isAnagram1(s1,s2));
 	}
 
 }
