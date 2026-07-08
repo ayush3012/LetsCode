@@ -41,6 +41,21 @@ public class Anagram {
 		return Arrays.equals(s1.chars().sorted().toArray(), s2.chars().sorted().toArray());
 	}
 
+	static boolean isAnagram_optimal(String s,String t)
+	{
+		if(s.length()!=t.length()) return false;
+		int[] freq=new int[26];
+		for (int i=0;i<s.length();i++)
+		{
+			freq[s.charAt(i)-'a']++;
+			freq[t.charAt(i)-'a']--;
+		}
+		for(int a:freq)
+			if(a!=0)
+				return false;
+		return true;
+	}
+
 	public static void main(String[] args) {
 		
 		String s1="abcdefbdff";
