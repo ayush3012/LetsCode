@@ -32,11 +32,27 @@ public class Histogram84 {
         }
         System.out.println(max);
     }
+
+    static void histogram_BruteForce(int[] heights)
+    {
+        int max=0;
+        for(int i=0;i<heights.length;i++)
+        {
+            int l=i,r=i;
+            while(l>=0 && heights[l]>=heights[i]) l--;
+            while (r<heights.length && heights[r]>=heights[i]) r++;
+            max=Math.max(max,(r-l-1)*heights[i]);
+        }
+
+        System.out.println(max);
+    }
     public static void main(String[] args) {
 
         int[] heights = {2,1,5,6,2,3};
         //int[] heights = {2,4};
 
         histogram(heights);
+
+        histogram_BruteForce(heights);
     }
 }
