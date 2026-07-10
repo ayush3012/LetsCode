@@ -198,10 +198,7 @@ maximumPoolSize
 
 Very common.
 
-12. What happens if
-core threads busy
-queue full
-new task arrives
+12. What happens if core threads busy queue full new task arrives
 
 Expected sequence
 
@@ -237,9 +234,13 @@ shutdownNow()
 16. What happens to running tasks during shutdown?
 17. Difference
 
-isShutdown()
+isShutdown(): It checks whether shutdown() (or shutdownNow()) has been called.
 
-isTerminated()
+* shutdown() : it only stops taking new jobs and finishes already running
+*
+* shutdownNow()) : It cancels all running task also
+*
+isTerminated(): shutdown() has been called and all submitted tasks have completed.
 
 Performance Questions
 18. How do you decide thread pool size?
@@ -312,17 +313,9 @@ Limitations of Future
 
 26. Difference
 
-runAsync()
+runAsync(): No return
 
-supplyAsync()
-
-runAsync
-
-No return
-
-supplyAsync
-
-Returns value
+supplyAsync(): Returns value
 
 27. Default thread pool?
 
@@ -331,13 +324,9 @@ Answer
 ForkJoinPool.commonPool()
 
 28. How to use custom Executor?
-ExecutorService executor =
-Executors.newFixedThreadPool(5);
+ExecutorService executor = Executors.newFixedThreadPool(5);
 
-CompletableFuture.supplyAsync(
-    () -> service.call(),
-    executor
-);
+CompletableFuture.supplyAsync(() -> service.call(),executor);
 29. Difference
 
 thenApply()
@@ -345,39 +334,38 @@ thenApply()
 thenAccept()
 
 thenRun()
+* | Method         | Receives previous result? | Returns a value? | Returns                   |
+| -------------- | ------------------------- | ---------------- | ------------------------- |
+| `thenApply()`  | ✅ Yes                     | ✅ Yes            | `CompletableFuture<U>`    |
+| `thenAccept()` | ✅ Yes                     | ❌ No             | `CompletableFuture<Void>` |
+| `thenRun()`    | ❌ No                      | ❌ No             | `CompletableFuture<Void>` |
+
+*
+*
 
 Very common.
 
 30. Difference
 
-thenCompose()
+thenCompose(): Dependent futures
 
-thenCombine()
+thenCombine(): Independent futures
 
-Expected
-
-Compose
-
-Dependent futures
-
-Combine
-
-Independent futures
 
 31. Difference
 
-thenApply()
+thenApply(): f1.thenApply(f2): first f1 then f2
 
 vs
 
-thenCompose()
+thenCompose(): f1.thenCompose(f2): first f2 then f1
 
 Extremely common.
 
 32. Explain
-CompletableFuture.allOf()
+CompletableFuture.allOf(): It waits for all future to be completed
 33. Explain
-CompletableFuture.anyOf()
+CompletableFuture.anyOf(): It just waits for first completed future
 34. How do exceptions propagate?
 
 Know
@@ -389,15 +377,15 @@ handle()
 whenComplete()
 35. Difference
 
-handle()
+handle(): run on both cases
 
-exceptionally()
+exceptionally(): runs only when exception occur
 
 36. Difference
 
-whenComplete()
+whenComplete(): just to log exception
 
-handle()
+handle(): exception can be converted into fallback recovery
 
 37. How to recover from failure?
 .exceptionally(ex -> defaultResponse)
@@ -414,16 +402,16 @@ get()
 
 Answer
 
-join()
+join(): in CompletableFuture , it throws completionException which wraps RuntimeException and do not support
+*       timeout
 
 Unchecked exception
 
-get()
+get(): It is in Future interface, checked exception handling required , timeout support
 
 Checked exception
 
-40. What happens if one future fails in
-allOf()
+40. What happens if one future fails in allOf()
 Coding Questions
 41. Fetch employee
 Employee e = employeeService.get();
@@ -431,27 +419,13 @@ Salary s = salaryService.get();
 
 Run in parallel.
 
-42. Download
+42. Download 10 files in parallel.
 
-10 files
-
-in parallel.
-
-43. Call three microservices
-
-Return first successful response.
+43. Call three microservices Return first successful response.
 
 44. Retry failed CompletableFuture.
 45. Timeout CompletableFuture after 2 seconds.
-46. Combine
-
-Price
-
-Tax
-
-Discount
-
-using CompletableFuture.
+46. Combine Price Tax Discount using CompletableFuture.
 
 47. Build dashboard API
 
@@ -468,41 +442,36 @@ parallel.
 49. Limit concurrency to 5 tasks.
 50. Parallel file processing.
 Tricky Questions (Very Common)
-Q1
+Q1 Why shouldn't we use Executors.newFixedThreadPool() in production?
 
-Why shouldn't we use
+Expected Answer"
 
-Executors.newFixedThreadPool()
+Because it uses an unbounded LinkedBlockingQueue. If tasks arrive faster than they are processed,
+* the queue can grow indefinitely, leading to high memory usage or OutOfMemoryError. In production,
+* it's often better to configure a ThreadPoolExecutor with a bounded queue and an appropriate rejection
+* policy.
 
-in production?
+Q2 Why is CompletableFuture.join() considered dangerous?
 
-Expected Answer
+It blocks the current thread. Calling join() too early or from a thread in the same limited thread pool
+* that's needed to complete the future can reduce parallelism or even cause thread starvation.
 
-Because it uses an unbounded LinkedBlockingQueue. If tasks arrive faster than they are processed, the queue can grow indefinitely, leading to high memory usage or OutOfMemoryError. In production, it's often better to configure a ThreadPoolExecutor with a bounded queue and an appropriate rejection policy.
+Q3 Can CompletableFuture make code faster?
 
-Q2
+Not necessarily. It improves responsiveness by enabling asynchronous execution. Performance gains occur
+* only when there is actual parallelizable work (for example, independent I/O-bound operations). Using
+* it for sequential or CPU-bound work without proper design may add overhead.
 
-Why is CompletableFuture.join() considered dangerous?
+Q4 Why avoid blocking calls inside CompletableFuture tasks?
 
-It blocks the current thread. Calling join() too early or from a thread in the same limited thread pool that's needed to complete the future can reduce parallelism or even cause thread starvation.
+If tasks submitted to a shared thread pool block for a long time (e.g., waiting on network or database calls),
+*  they occupy worker threads, reducing throughput and potentially starving other tasks. Consider
+* dedicated executors for blocking operations.
 
-Q3
+Q5 What happens if a CompletableFuture task throws an exception and you never call get() or join()?
 
-Can CompletableFuture make code faster?
-
-Not necessarily. It improves responsiveness by enabling asynchronous execution. Performance gains occur only when there is actual parallelizable work (for example, independent I/O-bound operations). Using it for sequential or CPU-bound work without proper design may add overhead.
-
-Q4
-
-Why avoid blocking calls inside CompletableFuture tasks?
-
-If tasks submitted to a shared thread pool block for a long time (e.g., waiting on network or database calls), they occupy worker threads, reducing throughput and potentially starving other tasks. Consider dedicated executors for blocking operations.
-
-Q5
-
-What happens if a CompletableFuture task throws an exception and you never call get() or join()?
-
-The exception is stored in the future. It won't automatically be thrown on another thread. If you never inspect the future or attach an exception handler, the failure can go unnoticed.
+The exception is stored in the future. It won't automatically be thrown on another thread. If you
+* never inspect the future or attach an exception handler, the failure can go unnoticed.
 
 * */
 
