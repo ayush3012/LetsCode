@@ -15,11 +15,50 @@ public class SuperPalindrome906 {
         return ans;
     }
 
-    public boolean isPalindrome(String s) {
+    public static boolean isPalindrome(String s) {
         return s!=null && s.equals(new StringBuffer(s).reverse().toString());
     }
 
+    static long create(int a,boolean flag)
+    {
+        long ans=a;
+        if(flag)
+            a=a/10;
+        while (a>0)
+        {
+            int d=a%10;
+            ans=ans*10+d;
+            a=a/10;
+        }
+       return ans;
+    }
+
+    static void superPalindrome(String left,String right)
+    {
+        int count=0;
+        Long l=Long.parseLong(left);
+        Long r=Long.parseLong(right);
+        for(int i=1;i<100000;i++)   // think why we took 100000?
+        {
+            long o=create(i,false);
+            long e=create(i,true);
+            long sq=o*o;
+            if(sq<=r)
+            {
+                if(sq>=l && isPalindrome(""+sq))
+                    count++;
+            }
+            sq=e*e;
+            if(sq<=r)
+            {
+                if(sq>=l && isPalindrome(""+sq))
+                    count++;
+            }
+        }
+        System.out.println(count);
+    }
     public static void main(String[] args) {
 
+        superPalindrome("4","1000");
     }
 }
