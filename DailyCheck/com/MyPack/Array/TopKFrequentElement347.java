@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class TopKFrequentElement {
+public class TopKFrequentElement347 {
 
     static void frequentElement(int[] arr,int k)
     {
