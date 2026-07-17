@@ -25,6 +25,25 @@ public class SequentialDigit1291 {
         }
         System.out.println(res);
     }
+
+    static void sequentialDigit_slidingWindow(int low,int high)
+    {
+        List<Integer> res=new ArrayList<>();
+        String s="123456789";
+        for(int i=(""+low).length();i<=(""+high).length();i++)
+        {
+            int left=0;
+            while(left+i-1<s.length())
+            {
+                String sub=s.substring(left,left+i);
+                int x=Integer.parseInt(sub);
+                if(x>=low && x<=high)
+                    res.add(x);
+                left++;
+            }
+        }
+        res.forEach(i-> System.out.println(i));
+    }
     public static void main(String[] args) {
         int low=100,high=300;
 
