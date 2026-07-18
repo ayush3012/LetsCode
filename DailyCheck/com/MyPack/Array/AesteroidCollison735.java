@@ -6,20 +6,20 @@ public class AesteroidCollison735 {
 
     static void aesteroidCollison(int[] asteroid)
     {
-        Stack<Integer> stk=new Stack();
+        Stack<Integer> stack=new Stack<>();
         for(int a:asteroid)
         {
-            if(a>0) stk.push(a);
+            if(a>0) stack.push(a);
             else {
-                while (!stk.isEmpty() && stk.peek()>0 && a<0 && stk.peek()<=Math.abs(a))
-                    stk.pop();
-                if(stk.isEmpty() && stk.peek()<0)
-                    stk.push(a);
-                else if(stk.peek()==Math.abs(a))
-                    stk.pop();
+                while (!stack.isEmpty() && stack.peek()>0 && stack.peek()<Math.abs(a))
+                    stack.pop();
+                if(stack.isEmpty() || stack.peek()<0)
+                    stack.push(a);
+                else if (stack.peek()==Math.abs(a))
+                    stack.pop();
             }
         }
-        stk.forEach(i-> System.out.print(i+" "));
+        stack.forEach(i-> System.out.print(i+" "));
     }
     public static void main(String[] args) {
 
