@@ -52,7 +52,9 @@ public class PrintZeroEvenOdd1116 {
                            }
                         }
                     }
-                }catch (Exception e){}
+                }catch (Exception e){
+                    throw new RuntimeException(e);
+                }
             });
         }
 
