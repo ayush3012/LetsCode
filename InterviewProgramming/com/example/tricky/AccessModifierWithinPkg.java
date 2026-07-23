@@ -1,4 +1,6 @@
-package com.example.tricky;
+package InterviewProgramming.com.example.tricky;
+
+import InterviewProgramming.com.example.tricky.AccessModifier;
 
 public class AccessModifierWithinPkg {
 

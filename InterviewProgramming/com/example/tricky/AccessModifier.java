@@ -1,4 +1,4 @@
-package com.example.tricky;
+package InterviewProgramming.com.example.tricky;
 
 public class AccessModifier {
 	
