@@ -1,6 +1,6 @@
-package com.ayush.test2;
+package Test.src.com.ayush.test2;
 
-import com.ayush.test.A;
+import Test.src.com.ayush.test2.D;
 
 public class DEMain {
 
