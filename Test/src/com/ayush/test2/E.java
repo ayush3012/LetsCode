@@ -1,6 +1,4 @@
-package com.ayush.test2;
-
-import com.ayush.test.A;
+package Test.src.com.ayush.test2;
 
 public class E extends D {
 	
