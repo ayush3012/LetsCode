@@ -59,14 +59,15 @@ public class SearchInRotatedSortedArray {
 	static void minimum(int[] arr)
 	{
 		int l=0,h= arr.length-1;
-		while (l<=h)
+		while (l<h)
 		{
 			int mid=l+(h-l)/2;
 			if(arr[mid]<=arr[h])
 				h=mid;
 			else l=mid+1;
 		}
-		System.out.println(arr[l]);
+		System.out.println("minimum "+arr[l]);
+		System.out.println("maximum "+arr[(l-1+arr.length)% arr.length]);
 	}
 	public static void main(String[] args) {
 		
