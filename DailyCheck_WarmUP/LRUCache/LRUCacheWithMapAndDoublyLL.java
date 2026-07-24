@@ -85,17 +85,6 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
         removeNode(node);
         return node.value;
     }
-
-    public int size()
-    {
-        return cache.size();
-    }
-
-    public boolean containsKey(K key)
-    {
-        return cache.containsKey(key);
-    }
-
     private void moveToHead(Node<K,V> node)
     {
         removeNode(node);
