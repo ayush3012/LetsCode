@@ -5,39 +5,40 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-public class LRUCacheWithDeque {
+public class LRUCacheWithDeque<K> {
 
-    static Deque<Integer> cache=new LinkedList<>();
-    static Set<Integer> presence=new HashSet<>();
+    Deque<K> cache=new LinkedList<>();
+    Set<K> presence=new HashSet<>();
     static final int capacity=4;
 
-    static void add(int page)
+    public void add(K page)
     {
         if(presence.add(page))
         {
             if(cache.size()==capacity)
             {
-                int rl=cache.removeFirst();
+                K rl=cache.removeFirst();
                 presence.remove(rl);
             }
         }else cache.removeLast();
         cache.add(page);
         presence.add(page);
     }
-    static void display()
+    public void display()
     {
-        for(int a:cache)
+        for(K a:cache)
             System.out.print(a+" ");
         System.out.println();
     }
 
     public static void main(String[] args) {
 
-        add(1);display();
-        add(2);display();
-        add(3);display();
-        add(4);display();
-        add(5);display();
-        add(6);display();
+        LRUCacheWithDeque<Integer> cacheWithDeque=new LRUCacheWithDeque<>();
+        cacheWithDeque.add(1);cacheWithDeque.display();
+        cacheWithDeque.add(2);cacheWithDeque.display();
+        cacheWithDeque.add(3);cacheWithDeque.display();
+        cacheWithDeque.add(4);cacheWithDeque.display();
+        cacheWithDeque.add(5);cacheWithDeque.display();
+        cacheWithDeque.add(6);cacheWithDeque.display();
     }
 }
