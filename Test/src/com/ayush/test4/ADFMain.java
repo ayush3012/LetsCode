@@ -1,9 +1,9 @@
 package Test.src.com.ayush.test4;
 
 
-import com.ayush.test3.F;
+import Test.src.com.ayush.test3.F;
 
-public class ADFMain extends F{
+public class ADFMain extends F {
 
 	public static void main(String[] args) {
 		
