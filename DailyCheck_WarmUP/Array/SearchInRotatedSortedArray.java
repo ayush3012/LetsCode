@@ -69,6 +69,20 @@ public class SearchInRotatedSortedArray {
 		System.out.println("minimum "+arr[l]);
 		System.out.println("maximum "+arr[(l-1+arr.length)% arr.length]);
 	}
+	static void minimumWithDuplicate(int[] arr)
+	{
+		int l=0,h= arr.length-1;
+		while (l<=h)
+		{
+			int mid=l+(h-l)/2;
+			if(arr[mid]<arr[h])
+				h=mid;
+			else if(arr[mid]>arr[h])
+				l=mid+1;
+			else h--;
+		}
+		System.out.println(arr[l]);
+	}
 	public static void main(String[] args) {
 		
 		int[] arr = {4,5,6,7,8,9,2,3};
@@ -80,6 +94,8 @@ public class SearchInRotatedSortedArray {
 		System.out.println(EnhancedSearchWithDuplicates(arr2,target));
 
 		minimum(arr);
+
+		minimumWithDuplicate(arr2);
 	}
 
 }
