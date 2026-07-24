@@ -1,6 +1,6 @@
-package com.ayush.test3;
+package Test.src.com.ayush.test3;
 
-import com.ayush.test2.D;
+import Test.src.com.ayush.test2.D;
 
 public class F extends D {
 	
