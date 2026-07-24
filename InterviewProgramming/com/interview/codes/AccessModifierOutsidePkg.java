@@ -1,6 +1,6 @@
 package InterviewProgramming.com.interview.codes;
 
-import com.example.tricky.AccessModifier;
+import InterviewProgramming.com.example.tricky.AccessModifier;
 
 public class AccessModifierOutsidePkg {
 
