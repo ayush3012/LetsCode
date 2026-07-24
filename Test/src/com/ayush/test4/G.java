@@ -1,7 +1,6 @@
 package Test.src.com.ayush.test4;
 
-import com.ayush.test3.F;
-import Test.src.com.ayush.test.A;
+import Test.src.com.ayush.test3.F;
 
 public class G extends F {
 	
