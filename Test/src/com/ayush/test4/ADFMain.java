@@ -1,7 +1,6 @@
-package com.ayush.test4;
+package Test.src.com.ayush.test4;
 
-import com.ayush.test.A;
-import com.ayush.test2.D;
+
 import com.ayush.test3.F;
 
 public class ADFMain extends F{
@@ -18,7 +17,7 @@ public class ADFMain extends F{
 		A obja=new A();
 		int var3=obja.a;*/
 		
-		System.out.println(new ADFMain().a);
+		//System.out.println(new ADFMain().a);
 		System.out.println(new ADFMain().d);
 		System.out.println(new ADFMain().f);
 		
