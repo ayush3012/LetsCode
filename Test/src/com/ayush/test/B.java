@@ -1,4 +1,4 @@
-package com.ayush.test;
+package Test.src.com.ayush.test;
 
 public class B extends A {
 	
