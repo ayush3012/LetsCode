@@ -31,7 +31,7 @@ public class SumOfSubarrayMinimum907 {
         {
             long left=i-l[i];
             long right=r[i]-i;
-            ans=(ans+arr[i]*left*right)%MOD;
+            ans=(ans+(long)arr[i]*left*right)%MOD; //long added after getting error in leetcode
         }
         System.out.println(ans);
     }
