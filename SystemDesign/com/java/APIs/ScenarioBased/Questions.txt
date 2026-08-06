@@ -1,7 +1,9 @@
 1.A customer reports duplicate orders. Where would you start investigating?
    Sample Interview Answer
 
-   "I would first determine whether the duplicate order was caused by the client, the network, the application, or downstream services. I'd trace the complete request flow from the API gateway to the database."
+   "I would first determine whether the duplicate order was caused by the client, the network,
+   the application, or downstream services. I'd trace the complete request flow from the API gateway
+   to the database."
 
    Then investigate in this order:
 
@@ -246,7 +248,9 @@
 
  Sample Interview Answer
 
- "Since the latency increased immediately after deployment, I'd first assume the deployment introduced the issue. I would compare the new release with the previous version and use monitoring tools, logs, and metrics to identify where the extra time is being spent."
+ "Since the latency increased immediately after deployment, I'd first assume the deployment introduced the
+ issue. I would compare the new release with the previous version and use monitoring tools, logs, and
+ metrics to identify where the extra time is being spent."
 
  Step 1: Confirm the Problem
 
@@ -1220,7 +1224,9 @@ Interview Answer (2 Minutes)
   A Kafka consumer is running, but messages are not being processed.?
   Sample Interview Answer
 
-  "I would trace the message flow from the producer to the consumer. First, I'd verify whether messages are reaching the Kafka topic, then confirm the consumer is part of the correct consumer group, has assigned partitions, is polling successfully, and is not failing during message processing."
+  "I would trace the message flow from the producer to the consumer. First, I'd verify whether messages
+  are reaching the Kafka topic, then confirm the consumer is part of the correct consumer group,
+  has assigned partitions, is polling successfully, and is not failing during message processing."
 
   Step 1: Check if Messages Are Actually in the Topic
 
@@ -1498,7 +1504,9 @@ Why can "@Transactional" fail to roll back changes?
 
 Interview Answer
 
-"@Transactional is implemented using Spring AOP proxies. Rollback can fail if the method is not invoked through the proxy, if the exception type doesn't trigger rollback, or if the transaction boundary is configured incorrectly."
+"@Transactional is implemented using Spring AOP proxies. Rollback can fail if the method is not invoked
+through the proxy, if the exception type doesn't trigger rollback, or if the transaction boundary is
+configured incorrectly."
 
 1. Exception is Caught (Most Common)
 Problem
@@ -1718,7 +1726,9 @@ How would you investigate a production memory leak?
 
 Interview Answer
 
-"I would first confirm that it is actually a memory leak and not simply high memory usage due to increased traffic. Then I'd use JVM metrics, GC logs, heap dumps, and profiling tools to identify which objects are continuously retained and why they are not being garbage collected."
+"I would first confirm that it is actually a memory leak and not simply high memory usage due to increased
+traffic. Then I'd use JVM metrics, GC logs, heap dumps, and profiling tools to identify which objects are
+continuously retained and why they are not being garbage collected."
 
 Step 1: Confirm It's Really a Memory Leak
 
@@ -2313,7 +2323,10 @@ If you had only 15 minutes to identify the root cause of a production incident, 
 
 Interview Answer
 
-"With only 15 minutes, my goal is not to investigate every possibility but to quickly identify the component causing the issue and restore service if possible. I would first determine the scope of the incident, identify what changed, and use monitoring to locate the bottleneck before diving into detailed debugging."
+"With only 15 minutes, my goal is not to investigate every possibility but to quickly identify the
+component causing the issue and restore service if possible. I would first determine the scope of the
+incident, identify what changed, and use monitoring to locate the bottleneck before diving into detailed
+debugging."
 
 My 15-Minute Production Incident Checklist
 Minute 1–2: Understand the Impact
