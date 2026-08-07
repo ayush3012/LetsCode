@@ -27,8 +27,8 @@ public class CombinationSum40 {
             return;
         for(int i=ind;i<arr.length;i++)
         {
-//            if(i>ind && arr[i-1]==arr[i])  //this condition is important to remove duplicate entry
-//                continue;                 // in same recursion level we are skipping duplicates
+            if(i>ind && arr[i-1]==arr[i])  //this condition is important to remove duplicate entry
+                continue;                 // in same recursion level we are skipping duplicates
             comb.add(arr[i]);
             backtrack(arr,sum-arr[i],i+1,comb,res);
             comb.remove(comb.size()-1);
