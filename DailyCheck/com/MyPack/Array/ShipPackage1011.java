@@ -2,7 +2,7 @@ package DailyCheck.com.MyPack.Array;
 
 public class ShipPackage1011 {
 
-    static boolean canLift(int[] weights,int capacity,int days)
+    static boolean canLift(int[] weights,int capacity,int days)  // check 881 problem also
     {
         int day=1;
         int currWeight=0;

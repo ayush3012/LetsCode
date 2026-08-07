@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 public class BoatToSavePeople881 {
 
-    static void minBoat(int[] people,int limit)
-    {
+    static void minBoat(int[] people,int limit) //if order is important then take approach 1011
+    {                                           //if order is not important and we can take any then take this.
         Arrays.sort(people);
         int left=0,right= people.length-1;
         int boat=0;
