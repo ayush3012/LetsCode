@@ -6,10 +6,10 @@ import java.util.Map;
 public class LRUCacheWithMapAndDoublyLL<K,V> {
 
     private static class Node<K,V>{
-        K key;
-        V value;
-        Node<K,V> pre;
-        Node<K,V> next;
+        private final K key;
+        private V value;
+        private Node<K,V> pre;
+        private Node<K,V> next;
 
         Node(K key,V value)
         {
@@ -117,6 +117,7 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
         return lruNode;
     }
 
+    @Override
     public String toString()
     {
         StringBuilder sb=new StringBuilder();
