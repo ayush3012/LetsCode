@@ -141,19 +141,13 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
     public static void main(String[] args) {
         LRUCacheWithMapAndDoublyLL<Integer,String> cache=new LRUCacheWithMapAndDoublyLL<>(3);
 
-        cache.put(1,"A");
-        cache.put(2,"B");
-        cache.put(3,"C");
+        cache.put(1,"A");System.out.println(cache);
+        cache.put(2,"B");System.out.println(cache);
+        cache.put(3,"C");System.out.println(cache);
 
-        System.out.println(cache);
+        cache.get(1);System.out.println(cache);
 
-        cache.get(1);
-
-        System.out.println(cache);
-
-        cache.put(4,"D");
-
-        System.out.println(cache);
+        cache.put(4,"D");System.out.println(cache);
 
         System.out.println(cache.get(2));
     }
