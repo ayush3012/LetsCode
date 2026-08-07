@@ -28,11 +28,11 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
 
     public LRUCacheWithMapAndDoublyLL(int capacity)
     {
-        if(capacity<0)
+        if(capacity<=0)
             throw new IllegalArgumentException("capacity should be positive");
 
         this.capacity=capacity;
-        cache=new HashMap<>(capacity);
+        cache=new HashMap<>((int)(capacity/0.75f)+1);  // it will avoid resizing
         this.head=new Node<>(null,null);
         this.tail=new Node<>(null,null);
 
@@ -101,8 +101,13 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
 
     private void removeNode(Node<K,V> node)
     {
+        if (node == head || node == tail)
+            return;
         node.pre.next=node.next;
         node.next.pre=node.pre;
+
+        node.pre=null;
+        node.next=null;
     }
 
     private Node<K,V> removeTail()
@@ -124,28 +129,32 @@ public class LRUCacheWithMapAndDoublyLL<K,V> {
                     .append("=")
                     .append(current.value)
                     .append("]");
+
+            if (current.next != tail) {
+                sb.append(" -> ");
+            }
             current=current.next;
         }
         return sb.toString();
     }
 
     public static void main(String[] args) {
-        LRUCacheWithMapAndDoublyLL<Integer,String> cahce=new LRUCacheWithMapAndDoublyLL<>(3);
+        LRUCacheWithMapAndDoublyLL<Integer,String> cache=new LRUCacheWithMapAndDoublyLL<>(3);
 
-        cahce.put(1,"A");
-        cahce.put(2,"B");
-        cahce.put(3,"C");
+        cache.put(1,"A");
+        cache.put(2,"B");
+        cache.put(3,"C");
 
-        System.out.println(cahce);
+        System.out.println(cache);
 
-        cahce.get(1);
+        cache.get(1);
 
-        System.out.println(cahce);
+        System.out.println(cache);
 
-        cahce.put(4,"D");
+        cache.put(4,"D");
 
-        System.out.println(cahce);
+        System.out.println(cache);
 
-        System.out.println(cahce.get(2));
+        System.out.println(cache.get(2));
     }
 }
