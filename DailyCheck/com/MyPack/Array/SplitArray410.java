@@ -37,7 +37,7 @@ public class SplitArray410 {
     }
 
     public static void main(String[] args) {
-        int[] nums = {7,2,5,10,8};int k = 2;
+        int[] nums = {7,2,5,10,8};int k = 2;  // compare this with shipPackage1011 problem
 
         System.out.println(splitArray(nums,k));
     }
