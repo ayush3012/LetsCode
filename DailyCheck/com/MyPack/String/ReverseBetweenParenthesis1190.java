@@ -58,7 +58,7 @@ public class ReverseBetweenParenthesis1190 {
 
         reverse(s);
 
-        String s1="3[a2[b3[c]]]";
+        String s1="3[a2[b3[c]]]"; //abcccbcccabcccbcccabcccbccc
 
         decodeString(s1);
     }
