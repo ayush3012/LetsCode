@@ -1,6 +1,6 @@
 package DailyCheck.com.MyPack.String;
 
-public class WordBreak {
+public class WordBreak139 {
 
     static boolean findWord(String s,String[] dict)
     {

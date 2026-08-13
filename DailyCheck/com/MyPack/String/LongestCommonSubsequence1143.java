@@ -1,6 +1,6 @@
 package DailyCheck.com.MyPack.String;
 
-public class LongestCommonSubsequence {
+public class LongestCommonSubsequence1143 {
 
     static void LCSImpl(String s1,String s2)
     {
