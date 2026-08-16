@@ -1,6 +1,6 @@
 package DailyCheck.com.MyPack.String;
 
-public class MinimumSubstringContainingAllChars {
+public class MinimumSubstringContainingAllChars76 {
 
     static void minWindow(String s,String x)
     {
