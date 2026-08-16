@@ -80,6 +80,19 @@ public class CoinChange {
 		}
 		System.out.println(dp[amount]>amount?-1:dp[amount]);
 	}
+
+	//leetcode518 total ways to make sum
+	static void coinChange518(int amount,int[] coins)
+	{
+		int[] dp=new int[amount+1];
+		dp[0]=1;
+		for(int coin:coins)
+		{
+			for(int i=coin;i<=amount;i++)
+				dp[i]+=dp[i-coin];
+		}
+		System.out.println(dp[amount]);
+	}
 	public static void main(String[] args) {
 		
 		int coins[] = { 9,6,5,1 };
@@ -88,6 +101,8 @@ public class CoinChange {
         System.out.println(coinChange(coins, n, sum));
 
 		coinChange322(coins,sum);
+
+		coinChange518(sum,coins);
 	}
 
 }
