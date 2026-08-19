@@ -72,6 +72,25 @@ public class AllSubArrayOfArray {
 			comb.remove(comb.size()-1);
 		}
 	}
+
+	private static void permutation(int[] nums,int ind,List<Integer> comb,List<List<Integer>> res,boolean[] vis)
+	{
+		if(comb.size()==nums.length)
+		{
+			res.add(new ArrayList<>(comb));
+			return;
+		}
+		for(int i=0;i< nums.length;i++)
+		{
+			if(vis[i])
+				continue;
+			vis[i]=true;
+			comb.add(nums[i]);
+			permutation(nums,i+1,comb,res,vis);
+			comb.remove(comb.size()-1);
+			vis[i]=false;
+		}
+	}
 	public static void main(String[] args) throws Exception {
 
 		int[] nums = {1,2,1};
@@ -90,6 +109,15 @@ public class AllSubArrayOfArray {
 		System.out.println("===SUBSET=====");
 
 		allSubset(nums);
+
+
+		System.out.println("===PERMUTATION=====");
+
+		List<List<Integer>> res1=new ArrayList<>();
+		boolean[] vis=new boolean[nums.length];
+		permutation(nums,0,new ArrayList<>(),res1,vis);
+
+		res1.forEach(i-> System.out.println(i));
 		
 	}
 
