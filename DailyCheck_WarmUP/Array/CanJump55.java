@@ -15,6 +15,18 @@ public class CanJump55 {
         }
         return true;
     }
+    public static boolean canJumpDP(int[] nums) {
+        boolean[] dp=new boolean[nums.length];
+        dp[0]=true;
+        for(int i=0;i<nums.length;i++)
+        {
+            if(!dp[i])
+                continue;
+            for(int j=i+1;j<=Math.min(i+nums[i],nums.length-1);j++)
+                dp[j]=true;
+        }
+        return dp[nums.length-1];
+    }
     public static void main(String[] args) {
 
         //int[] nums = {2,3,1,1,4};
