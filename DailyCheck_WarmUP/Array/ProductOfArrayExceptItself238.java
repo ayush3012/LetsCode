@@ -2,7 +2,7 @@ package DailyCheck_WarmUP.Array;
 
 import java.util.Arrays;
 
-public class ProductOfArrayExceptItself {
+public class ProductOfArrayExceptItself238 {
 
     static void product(int[] arr)
     {
