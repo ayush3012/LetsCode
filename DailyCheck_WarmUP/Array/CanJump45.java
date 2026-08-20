@@ -24,12 +24,12 @@ public class CanJump45 {
 
     public static int jump(int[] nums) {
         int[] dp = new int[nums.length];
-        Arrays.fill(dp, Integer.MAX_VALUE);
+        Arrays.fill(dp, -1);
         dp[0] = 0;
         for (int i = 0; i < nums.length; i++)
         {
             for (int j = i + 1; j <= Math.min(i + nums[i], nums.length - 1); j++)
-                if (dp[i] != Integer.MAX_VALUE)
+                if (dp[i] != -1)
                     dp[j] = Math.min(dp[j], dp[i] + 1);
         }
         return dp[nums.length - 1];
