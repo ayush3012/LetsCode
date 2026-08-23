@@ -1,4 +1,4 @@
-package LeetCode.src.JavaCode;
+package DailyCheck_WarmUP.Array;
 
 public class HouseRobber198 {
 
