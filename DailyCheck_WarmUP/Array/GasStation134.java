@@ -20,6 +20,25 @@ public class GasStation134 {
         }
         System.out.println(total>=0?start:-1);
     }
+
+    public static int canCompleteCircuit2(int[] gas, int[] cost) {
+        int sgas=0,scost=0,ind=0;
+        for(int a:gas) sgas+=a;
+        for(int a:cost) scost+=a;
+        if(scost>sgas)
+            return -1;
+        int total=0;
+        for(int i=0;i<gas.length;i++)
+        {
+            total+=gas[i]-cost[i];
+            if(total<0)
+            {
+                ind=i+1;
+                total=0;
+            }
+        }
+        return ind;
+    }
     public static void main(String[] args) {
 
         int[] gas = {1,2,3,4,5};int[] cost = {3,4,5,1,2};
