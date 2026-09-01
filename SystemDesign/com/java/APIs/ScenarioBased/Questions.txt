@@ -2526,3 +2526,5 @@ A strong closing statement is:
 
 "During an incident, my priority is: Stabilize the service first, identify the root cause second,
 and implement a permanent fix third."
+-----------------------------------------------------
+I want to store 1M byte arrays of 10 bytes each. There are 2 ways new byte[ 1000000 * 10 ] new byte[ 1000000 ][ 10 ] Which is better from a space perspective?
