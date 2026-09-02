@@ -7,6 +7,7 @@ import java.util.Set;
 class Student{
     int id;
     String name;
+    //Address address: if class has mutable fields like this then we should exclude from hashcode and equals
 
     Student(int id,String name)
     {
