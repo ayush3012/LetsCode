@@ -14,7 +14,7 @@ public class CarFleet853 {
             cars[i][0]=position[i];
             cars[i][1]=speed[i];
         }
-        Arrays.sort(cars,(a,b)->b[0]-a[1]);
+        Arrays.sort(cars,(a,b)->b[0]-a[0]);
         Stack<Double> stk=new Stack<>();
 
         for(int[] car:cars)
