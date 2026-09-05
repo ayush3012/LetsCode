@@ -1,5 +1,7 @@
 package InterviewProgramming.com.java.collection;
 
+import InterviewProgramming.com.interview.codes.Practice;
+
 public class myCustomHashMap<K,V> {
 
     static class Node<K,V>
@@ -73,6 +75,44 @@ public class myCustomHashMap<K,V> {
         }
         pre=head;
         head=head.next;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb=new StringBuilder("{");
+        for(int i=0;i<capacity;i++)
+        {
+            Node<K,V> node=bucket[i];
+            while (node!=null)
+            {
+                sb.append(node.key)
+                        .append("=")
+                        .append(node.value);
+                node=node.next;
+                if(node!=null)
+                    sb.append("->");
+                if(node==null)
+                    sb.append(",");
+            }
+        }
+        if (sb.charAt(sb.length() - 1) == ',') {
+            sb.setLength(sb.length() - 1);
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        myCustomHashMap<Integer,String> map=new myCustomHashMap();
+
+        map.put(1,"a");
+        map.put(2,"a");
+        map.put(3,"a");
+        map.put(4,"a");
+
+        System.out.println(map);
     }
 
 }
