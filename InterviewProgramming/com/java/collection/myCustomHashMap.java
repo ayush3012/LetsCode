@@ -2,6 +2,8 @@ package InterviewProgramming.com.java.collection;
 
 import InterviewProgramming.com.interview.codes.Practice;
 
+import java.util.Objects;
+
 public class myCustomHashMap<K,V> {
 
     static class Node<K,V>
@@ -26,7 +28,7 @@ public class myCustomHashMap<K,V> {
 
     int getIndex(K key)
     {
-        return Math.abs(key.hashCode())%capacity;
+        return Math.floorMod(key.hashCode(),capacity);
     }
 
     void put(K key,V value)
@@ -35,7 +37,7 @@ public class myCustomHashMap<K,V> {
         Node<K,V> head=bucket[idx];
         while (head!=null)
         {
-            if(head.key.equals(key))
+            if(Objects.equals(head.key,key))
             {
                 head.value=value;
                 return;
@@ -53,7 +55,7 @@ public class myCustomHashMap<K,V> {
         Node<K,V> head=bucket[idx];
         while (head!=null)
         {
-            if(head.key.equals(key))
+            if(Objects.equals(head.key,key))
                 return head.value;
             else head=head.next;
         }
@@ -68,13 +70,15 @@ public class myCustomHashMap<K,V> {
         while (head!=null)
         {
             if(head.key.equals(key))
+            {
                 if(pre==null)
                     bucket[idx]=head.next;
                 else pre.next=head.next;
-            return;
+                return;
+            }
+            pre=head;
+            head=head.next;
         }
-        pre=head;
-        head=head.next;
     }
 
     @Override
