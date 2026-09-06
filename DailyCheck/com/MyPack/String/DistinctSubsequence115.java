@@ -50,6 +50,16 @@ public class DistinctSubsequence115 {
             ans+=solve(dp,s,t,i+1,j+1);
         return dp[i][j]=ans;
     }
+
+    public static int numDistinct_otherSolution(String s, String t) {
+        int[] curr=new int[t.length()+1];curr[t.length()]=1;
+        for(int i=s.length()-1;i>=0;i--){
+            for(int j=0;j<t.length();j++){
+                curr[j]=s.charAt(i)==t.charAt(j)?curr[j]+curr[j+1]:curr[j];
+            }
+        }
+        return curr[0];
+    }
     public static void main(String[] args) {
 
         //String s = "rabbbit", t = "rabbit";
@@ -57,5 +67,7 @@ public class DistinctSubsequence115 {
         String s = "babgbag", t = "bag";
 
         System.out.println(numDistinct(s,t));
+
+        System.out.println(numDistinct_otherSolution(s,t));
     }
 }
