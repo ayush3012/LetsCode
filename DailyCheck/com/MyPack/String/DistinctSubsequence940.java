@@ -1,6 +1,6 @@
 package DailyCheck.com.MyPack.String;
 
-public class DistinctSubsequence904 {
+public class DistinctSubsequence940 {
 
     public static int distinctSubseqII(String s) {
         final int MOD=1000000007;
