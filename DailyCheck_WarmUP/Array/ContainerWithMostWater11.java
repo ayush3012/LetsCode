@@ -1,6 +1,6 @@
 package DailyCheck_WarmUP.Array;
 
-public class ContainerWithMostWater {
+public class ContainerWithMostWater11 {
 
     static void mostWater(int[] arr)
     {
