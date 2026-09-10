@@ -1,4 +1,4 @@
-package DailyCheck_WarmUP.Array;
+package DailyCheck.com.MyPack.Array;
 
 import java.util.Arrays;
 
