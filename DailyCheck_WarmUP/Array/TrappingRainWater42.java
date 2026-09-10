@@ -1,6 +1,6 @@
 package DailyCheck_WarmUP.Array;
 
-public class TrappingRainWater {
+public class TrappingRainWater42 {
 	
 	public static void TrapWater(int[] arr)
 	{
