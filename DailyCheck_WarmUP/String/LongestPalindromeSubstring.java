@@ -74,6 +74,26 @@ public class LongestPalindromeSubstring {
 		String right=Palindrome_recursion_leetcode(s.substring(0,s.length()-1));
 		return left.length()>right.length()?left:right;
 	}
+
+	public static void longestPalindromeDP(String s)
+	{
+		boolean[][] dp=new boolean[s.length()][s.length()];
+		int st=0,max=0;
+		for(int i=s.length()-1;i>=0;i--)
+		{
+			for(int j=i;j<s.length();j++)
+			{
+				dp[i][j]=s.charAt(i)==s.charAt(j) && (j-i<2 || dp[i+1][j-1]);
+
+				if(dp[i][j] && j-i+1>max)
+				{
+					max=j-i+1;
+					st=i;
+				}
+			}
+		}
+		System.out.println(s.substring(st,st+max));
+	}
 	public static void main(String[] args) {
 		
 		System.out.println(LongestPalindrome("ababa"));
@@ -81,6 +101,8 @@ public class LongestPalindromeSubstring {
 		System.out.println(LongestPalindrome_leetcode("abab"));
 		
 		System.out.println(Palindrome_recursion_leetcode("abab"));
+
+		longestPalindromeDP("ababa");
 	}
 
 }
