@@ -19,18 +19,21 @@ public class MinimumNumberOfConferenceRoom {
 	
 	public static int minMeetingRoom(List<Meeting> meeting)
 	{
-		if(meeting == null || meeting.size()==0)
+		if(meeting == null || meeting.isEmpty())
 			return 0;
 		meeting.sort(Comparator.comparingInt(i->i.start));
 		PriorityQueue<Integer> minHeap=new PriorityQueue<>();
 		minHeap.add(meeting.get(0).end);
+		int room=0;
 		for(int i=1;i<meeting.size();i++)
 		{
-			if(meeting.get(i).start>=minHeap.peek())
+			if(!minHeap.isEmpty() && meeting.get(i).start>=minHeap.peek())
 				 minHeap.poll();
 			minHeap.add(meeting.get(i).end);
+
+			room=Math.max(room,meeting.size());
 		}
-		return minHeap.size();
+		return room;
 	}
 
 	public static void main(String[] args) {
