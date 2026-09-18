@@ -29,7 +29,7 @@ class Student{
         if(!(obj instanceof Student))
             return false;
         Student s=(Student)obj;
-        return this.id==s.id && this.name.equals(s.name);
+        return this.id==s.id && Objects.equals(s.name,this.name);
     }
 }
 public class ObjectAsKey {
